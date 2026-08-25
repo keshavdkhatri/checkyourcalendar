@@ -1,0 +1,185 @@
+---
+interface Props {
+  id: string;
+  name: string;
+  type: 'festival' | 'fast' | 'holy_day' | 'national_holiday' | 'international_day' | 'commemoration';
+  calendarName: string;
+  regionName: string;
+  summary: string;
+  storyRef?: string;
+}
+
+const { id, name, type, calendarName, regionName, summary, storyRef } = Astro.props;
+
+const typeLabelMap: Record<string, string> = {
+  festival: 'Festival',
+  fast: 'Fasting / Vrat',
+  holy_day: 'Holy Day',
+  national_holiday: 'National Holiday',
+  international_day: 'International Day',
+  commemoration: 'Commemoration',
+};
+
+const badgeClassMap: Record<string, string> = {
+  festival: 'badge-festival',
+  fast: 'badge-fast',
+  holy_day: 'badge-holy-day',
+  national_holiday: 'badge-national',
+  international_day: 'badge-international',
+  commemoration: 'badge-commemoration',
+};
+
+const typeLabel = typeLabelMap[type] || type;
+const badgeClass = badgeClassMap[type] || 'badge-default';
+---
+
+<article class="observance-card">
+  <div class="card-header">
+    <h3 class="observance-title">
+      {storyRef ? (
+        <a href={`/story/${storyRef}`} class="title-link">{name}</a>
+      ) : (
+        name
+      )}
+    </h3>
+    <span class={`type-badge ${badgeClass}`}>{typeLabel}</span>
+  </div>
+  
+  <p class="summary">{summary}</p>
+  
+  <div class="metadata">
+    <span class="meta-item">
+      <span class="material-symbols-outlined icon">calendar_today</span>
+      {calendarName}
+    </span>
+    <span class="meta-item">
+      <span class="material-symbols-outlined icon">location_on</span>
+      {regionName}
+    </span>
+  </div>
+  
+  {storyRef && (
+    <div class="action-row">
+      <a href={`/story/${storyRef}`} class="story-link">
+        Read the Story Behind the Day
+        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+      </a>
+    </div>
+  )}
+</article>
+
+<style>
+  .observance-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .observance-card:hover {
+    background-color: var(--color-surface-container-low);
+    border-color: var(--color-outline-variant);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .observance-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .title-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .type-badge {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  /* Badge Categories based on Design System specs */
+  .badge-festival {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .badge-fast {
+    background-color: var(--color-secondary-container);
+    color: var(--color-on-secondary-container);
+  }
+
+  .badge-commemoration {
+    background-color: var(--color-tertiary-container);
+    color: var(--color-on-tertiary-container);
+  }
+
+  .badge-holy-day, .badge-national, .badge-international, .badge-default {
+    background-color: var(--color-surface-dim);
+    color: var(--color-on-surface-variant);
+    border: 1px solid var(--color-outline);
+  }
+
+  .summary {
+    font-size: 0.9375rem;
+    color: var(--color-on-background);
+    line-height: 1.5;
+  }
+
+  .metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface-dim);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+  }
+
+  .icon {
+    font-size: 0.9375rem !important;
+  }
+
+  .action-row {
+    margin-top: auto;
+    border-top: 1px dashed var(--color-outline);
+    padding-top: var(--spacing-md);
+  }
+
+  .story-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .story-link:hover {
+    text-decoration: underline;
+  }
+</style>

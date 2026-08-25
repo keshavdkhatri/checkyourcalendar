@@ -1,0 +1,197 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { mockStories } from '../data/mockData';
+
+const storiesList = Object.values(mockStories);
+---
+
+<Layout title="Stories - Feed" description="Read the Story Behind the Day and explore the history, legends, and significance of cultural holidays.">
+  <Header activeTab="stories" />
+
+  <main class="container main-content">
+    <section class="explorer-header">
+      <h1 class="page-title">Stories Behind the Day</h1>
+      <p class="page-intro">
+        Delve deeper into cultural traditions. Every calendar date is more than a number — it carries history, storytelling, and human connection.
+      </p>
+    </section>
+
+    <!-- Editorial Feed Grid -->
+    <section class="stories-feed-grid">
+      {storiesList.map((story, index) => {
+        // Make the first story featured/larger if desired, or keep them balanced.
+        const isFeatured = index === 0;
+        return (
+          <article class={`story-row-card ${isFeatured ? 'featured' : ''}`}>
+            <div class="thumbnail-area">
+              <span class="material-symbols-outlined icon">auto_stories</span>
+            </div>
+            
+            <div class="content-area">
+              <span class="category-label">{story.category}</span>
+              <h2 class="story-heading">
+                <a href={`/story/${story.slug}`}>{story.title}</a>
+              </h2>
+              <p class="excerpt">{story.excerpt}</p>
+              <div class="footer-meta">
+                <span class="publish-date">{story.publishDate}</span>
+                <a href={`/story/${story.slug}`} class="read-link">
+                  Read Article
+                  <span class="material-symbols-outlined link-icon">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .explorer-header {
+    max-width: 800px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .page-intro {
+    font-size: 1.125rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  /* Story layout cards */
+  .stories-feed-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .story-row-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .story-row-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 74, 63, 0.08);
+  }
+
+  .thumbnail-area {
+    height: 160px;
+    background-color: var(--color-surface-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  .thumbnail-area .icon {
+    font-size: 3rem !important;
+    color: var(--color-outline-variant);
+  }
+
+  .content-area {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex-grow: 1;
+  }
+
+  .category-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .story-heading {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+  }
+
+  .story-heading a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .excerpt {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .footer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    border-top: 1px dashed var(--color-outline);
+    padding-top: var(--spacing-sm);
+  }
+
+  .publish-date {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .read-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .read-link:hover {
+    text-decoration: underline;
+  }
+
+  .read-link .link-icon {
+    font-size: 0.875rem !important;
+  }
+
+  @media (min-width: 768px) {
+    .story-row-card {
+      flex-direction: row;
+      height: 220px;
+    }
+
+    .thumbnail-area {
+      width: 260px;
+      height: 100%;
+      border-bottom: none;
+      border-right: 1px solid var(--color-outline);
+      flex-shrink: 0;
+    }
+  }
+</style>

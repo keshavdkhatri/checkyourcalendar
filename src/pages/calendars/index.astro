@@ -1,0 +1,237 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const calendarsList = [
+  {
+    id: 'hindu-vikram',
+    name: 'Vikram Samvat (Gujarati/Hindu)',
+    type: 'Lunisolar',
+    description: 'A traditional lunisolar calendar used historically across Northern and Western India, including Gujarat. The Vikram Samvat era is offset by approximately 57 years ahead of the Gregorian calendar. Months are based on lunar phases, while the year aligns with solar cycles.',
+    cycleNote: 'Lunisolar, 12 lunar months (~354 days) with an extra intercalary month (Adhik Maas) added roughly every 3 years to align with the solar year.',
+    variations: 'Regional variations include Kartika-adi (New Year begins in Autumn, observed in Gujarat) and Chaitra-adi (New Year begins in Spring).'
+  },
+  {
+    id: 'islamic-civil',
+    name: 'Hijri (Islamic)',
+    type: 'Lunar',
+    description: 'A purely lunar calendar consisting of 12 lunar months in a year of 354 or 355 days. It is used to determine the proper days of Islamic observances and festivals. The era begins with the Hijra (migration of Prophet Muhammad from Mecca to Medina) in 622 CE.',
+    cycleNote: 'Purely lunar. Dates drift backward through the Gregorian solar year by approximately 11 days annually.',
+    variations: 'Umm al-Qura (calculated, used in Saudi Arabia), Tabular Islamic (arithmetic calculation), and local crescent-sighting variations.'
+  },
+  {
+    id: 'hebrew',
+    name: 'Hebrew Calendar',
+    type: 'Lunisolar',
+    description: 'The traditional calendar used for Jewish religious and national observances. It determines the dates for Jewish holidays, weekly Torah portions, and memorial dates. It is calculated using a combination of astronomical lunar cycles and seasonal solar adjustments.',
+    cycleNote: 'Lunisolar, using the 19-year Metonic cycle to insert an extra leap month (Adar I) seven times within the cycle to keep festivals in their correct seasons.',
+    variations: 'Calculated mathematical rules are globally standardized today, though historically determined by visual observation in Israel.'
+  },
+  {
+    id: 'persian',
+    name: 'Solar Hijri (Persian)',
+    type: 'Solar',
+    description: 'The official calendar of Iran and Afghanistan. It is one of the most accurate calendar systems in use today, determining its New Year (Nowruz) on the astronomical vernal equinox. The era begins with the Hijra in 622 CE, matching the Hijri calendar, but calculations are solar-based.',
+    cycleNote: 'Purely solar. The length of months is determined astronomically by the Sun’s transit through zodiacal signs.',
+    variations: 'Astronomical calculations (Jalali system) compared to rule-based leap year models.'
+  },
+  {
+    id: 'indian-saka',
+    name: 'Indian National (Saka)',
+    type: 'Solar',
+    description: 'The official civil calendar of India, introduced in 1957. It is used alongside the Gregorian calendar for government communications. The calendar uses the Saka era, which is offset by 78 years behind the Gregorian calendar.',
+    cycleNote: 'Purely solar. Year begins on March 22 (March 21 in leap years) on the day of the vernal equinox. Months have fixed lengths.',
+    variations: 'Standardized by the Indian Calendar Reform Committee; distinct from traditional religious regional calendars.'
+  }
+];
+---
+
+<Layout title="Calendars - Explorer" description="Discover and learn about the diverse calendar systems supported by CheckYourCalendar.">
+  <Header activeTab="calendars" />
+
+  <main class="container main-content">
+    <section class="explorer-header">
+      <h1 class="page-title">Supported Calendar Systems</h1>
+      <p class="page-intro">
+        Timekeeping is a reflection of geography, culture, and science. CheckYourCalendar supports several major calendar systems, allowing you to discover how different traditions mark the passage of time.
+      </p>
+    </section>
+
+    <!-- Calendar List Feed -->
+    <section class="calendars-feed">
+      {calendarsList.map(cal => (
+        <article class="calendar-detail-card" id={cal.id}>
+          <div class="card-header">
+            <h2 class="calendar-title">{cal.name}</h2>
+            <span class="type-badge">{cal.type}</span>
+          </div>
+          
+          <div class="card-content">
+            <p class="description">{cal.description}</p>
+            
+            <div class="technical-details">
+              <div class="detail-item">
+                <span class="detail-label">Calculation Cycle</span>
+                <p class="detail-value">{cal.cycleNote}</p>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Regional Variations</span>
+                <p class="detail-value">{cal.variations}</p>
+              </div>
+            </div>
+            
+            <div class="action-footer">
+              <a href={`/?c=${cal.id}`} class="explore-btn">
+                <span class="material-symbols-outlined icon">explore</span>
+                View Current Month
+              </a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .explorer-header {
+    max-width: 800px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .page-intro {
+    font-size: 1.125rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  .calendars-feed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .calendar-detail-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    scroll-margin-top: 100px; /* Offset for sticky header */
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .calendar-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .type-badge {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--color-secondary-container);
+    color: var(--color-on-secondary-container);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .description {
+    font-size: 0.9375rem;
+    color: var(--color-on-background);
+    line-height: 1.6;
+  }
+
+  .technical-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    background-color: var(--color-surface-dim);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--color-secondary);
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .detail-value {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .action-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+  }
+
+  .explore-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .explore-btn .icon {
+    font-size: 0.9375rem !important;
+  }
+
+  @media (min-width: 768px) {
+    .technical-details {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

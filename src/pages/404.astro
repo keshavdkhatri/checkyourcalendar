@@ -1,0 +1,215 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Page Not Found" description="The page you were looking for could not be found. Use our navigation to return to the active calendar date.">
+  <Header />
+
+  <main class="container main-content">
+    <section class="error-container">
+      <span class="material-symbols-outlined error-icon">explore_off</span>
+      <h1 class="error-title">Page Not Found</h1>
+      <p class="error-description">
+        We couldn't find the page or date conversion you were looking for. The link may have expired, or there may be a calculation error.
+      </p>
+
+      <!-- Recovery Actions -->
+      <div class="recovery-box">
+        <h2 class="recovery-title">Where would you like to go?</h2>
+        <div class="recovery-links">
+          <a href="/" class="recovery-btn primary-btn">
+            <span class="material-symbols-outlined">today</span>
+            Go to Today
+          </a>
+          <a href="/calendars" class="recovery-btn">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Calendars
+          </a>
+          <a href="/observances" class="recovery-btn">
+            <span class="material-symbols-outlined">event_note</span>
+            Observances
+          </a>
+          <a href="/stories" class="recovery-btn">
+            <span class="material-symbols-outlined">auto_stories</span>
+            Stories
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Search Recovery -->
+      <div class="search-recovery">
+        <p class="search-prompt">Or try searching for it directly:</p>
+        <form action="/search" method="GET" class="search-bar">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input 
+            type="search" 
+            name="q" 
+            placeholder="Search dates, festivals, or calendars..." 
+            class="search-input" 
+            aria-label="Search site content"
+            required
+          />
+          <button type="submit" class="search-btn">Search</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+  }
+
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 600px;
+    gap: var(--spacing-sm);
+  }
+
+  .error-icon {
+    font-size: 5rem !important;
+    color: var(--color-primary);
+    opacity: 0.8;
+  }
+
+  .error-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    color: var(--color-primary);
+  }
+
+  .error-description {
+    font-size: 1rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  /* Recovery buttons box */
+  .recovery-box {
+    margin-top: var(--spacing-md);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    width: 100%;
+  }
+
+  .recovery-title {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .recovery-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .recovery-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+  }
+
+  .recovery-btn:hover {
+    background-color: var(--color-outline-variant);
+  }
+
+  .recovery-btn.primary-btn {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+  }
+
+  .recovery-btn.primary-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  /* Search Recovery */
+  .search-recovery {
+    margin-top: var(--spacing-md);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    text-align: left;
+  }
+
+  .search-prompt {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    text-align: center;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 6px var(--spacing-md);
+    width: 100%;
+  }
+
+  .search-icon {
+    color: var(--color-on-surface-variant);
+  }
+
+  .search-input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
+    font-size: 0.875rem;
+    color: var(--color-on-surface);
+  }
+
+  .search-btn {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .search-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  @media (min-width: 576px) {
+    .recovery-links {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

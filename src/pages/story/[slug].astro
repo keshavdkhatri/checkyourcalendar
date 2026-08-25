@@ -1,0 +1,229 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { mockStories } from '../../data/mockData';
+
+export async function getStaticPaths() {
+  return Object.keys(mockStories).map(slug => ({
+    params: { slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const story = mockStories[slug];
+
+if (!story) {
+  // Safe fallback if build fails to find story
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={story.title} description={story.excerpt} type="article">
+  <Header activeTab="stories" />
+
+  <!-- Breadcrumbs -->
+  <nav class="container breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href="/stories">Stories</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>{story.title}</li>
+    </ol>
+  </nav>
+
+  <main class="container main-content">
+    <article class="story-article">
+      <header class="story-header">
+        <span class="story-category">{story.category}</span>
+        <h1 class="story-title">{story.title}</h1>
+        <p class="story-subtitle">{story.subtitle}</p>
+        
+        <div class="story-meta">
+          <span class="meta-date">Published on {story.publishDate}</span>
+          <span class="meta-author">By Editorial Team</span>
+        </div>
+      </header>
+
+      <!-- Main Body Content -->
+      <section class="story-body">
+        {story.content.map(paragraph => (
+          <p>{paragraph}</p>
+        ))}
+      </section>
+
+      <!-- Sources & Citations -->
+      <section class="story-sources">
+        <h2 class="section-title">Sources & Citations</h2>
+        <ol class="sources-list">
+          {story.sources.map(source => (
+            <li class="source-item">{source}</li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Related Connections -->
+      <section class="related-connections">
+        <h2 class="section-title">Related Observances</h2>
+        <div class="related-links">
+          {story.relatedObservances.map(obs => (
+            <a href={obs.url} class="connection-btn">
+              <span class="material-symbols-outlined">event_note</span>
+              {obs.name}
+            </a>
+          ))}
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .breadcrumbs {
+    padding-top: var(--spacing-md);
+    padding-bottom: 0;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .breadcrumb-item a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .breadcrumb-item.active {
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .separator {
+    font-size: 1rem !important;
+    margin: 0 4px;
+    color: var(--color-outline-variant);
+  }
+
+  .main-content {
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  /* Editorial style story layout */
+  .story-article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .story-header {
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-md);
+  }
+
+  .story-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .story-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    line-height: 1.15;
+    margin: var(--spacing-xs) 0;
+  }
+
+  .story-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    line-height: 1.4;
+  }
+
+  .story-meta {
+    display: flex;
+    gap: var(--spacing-md);
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-sm);
+  }
+
+  .story-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-on-background);
+  }
+
+  .story-body p {
+    text-indent: 0;
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  /* Sources section */
+  .story-sources {
+    margin-top: var(--spacing-xl);
+    background-color: var(--color-surface-dim);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-sm);
+  }
+
+  .sources-list {
+    padding-left: var(--spacing-lg);
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  /* Related Connections */
+  .related-connections {
+    margin-top: var(--spacing-lg);
+  }
+
+  .related-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .connection-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-full);
+    padding: 6px 16px;
+    font-size: 0.8125rem;
+    color: var(--color-primary);
+  }
+
+  .connection-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    border-color: var(--color-primary);
+  }
+</style>

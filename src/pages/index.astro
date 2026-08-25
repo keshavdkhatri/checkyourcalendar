@@ -1,17 +1,386 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import DateCompareGrid from '../components/DateCompareGrid.astro';
+import ObservanceCard from '../components/ObservanceCard.astro';
+import { mockConversions, mockObservances } from '../data/mockData';
 
+const todayGregorian = "Monday, August 24, 2026";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Home - Today's Meaning Across Calendars">
+  <Header activeTab="today" />
+
+  <main class="container main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-info">
+        <div class="demo-tag-container">
+          <span class="demo-badge">Demonstration Date & Mock Calculations</span>
+        </div>
+        <h1 class="date-title">{todayGregorian}</h1>
+        <p class="hero-tagline">Know the date. Know the day. Know why it matters.</p>
+        
+        <!-- Date Lookup Selector -->
+        <div class="search-box">
+          <span class="material-symbols-outlined search-icon">calendar_month</span>
+          <form class="search-form" action="/date/" method="GET">
+            <input 
+              type="text" 
+              name="d" 
+              class="search-input" 
+              placeholder="Explore another date... (e.g., YYYY-MM-DD)" 
+              aria-label="Explore another date"
+              value="2026-08-24"
+            />
+            <button type="submit" class="search-btn">Go</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Bento Grid Conversions -->
+      <div class="hero-conversions">
+        <DateCompareGrid conversions={mockConversions} />
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- Two Column Feed and Spotlight -->
+    <section class="content-feed">
+      <div class="observances-column">
+        <h2 class="section-title">
+          <span class="material-symbols-outlined section-icon">event_note</span>
+          Today's Observances
+        </h2>
+        <div class="observances-list">
+          {mockObservances.map(obs => (
+            <ObservanceCard 
+              id={obs.id}
+              name={obs.name}
+              type={obs.type}
+              calendarName={obs.calendarName}
+              regionName={obs.regionName}
+              summary={obs.summary}
+              storyRef={obs.storyRef}
+            />
+          ))}
+        </div>
+      </div>
+
+      <!-- Spotlight Sidebar -->
+      <div class="spotlight-column">
+        <h2 class="section-title">
+          <span class="material-symbols-outlined section-icon">insights</span>
+          Today's Meaning
+        </h2>
+        <aside class="spotlight-card">
+          <h3 class="spotlight-title">Why Today Matters</h3>
+          <p class="spotlight-text">
+            Today marks a unique intersection in celestial timekeeping. The 11th tithi (Ekadashi) in the lunar cycle coincides with the late summer monsoon transition in South Asia, a period historically associated with purification and renewal. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles and spiritual milestones.
+          </p>
+        </aside>
+
+        <!-- Featured Story teaser card -->
+        <aside class="story-teaser-card">
+          <div class="image-placeholder" aria-hidden="true">
+            <span class="material-symbols-outlined placeholder-icon">auto_stories</span>
+          </div>
+          <div class="teaser-content">
+            <span class="teaser-label">Featured Story</span>
+            <h3 class="teaser-title">The Legend of Putrada Ekadashi</h3>
+            <p class="teaser-excerpt">The ancient narrative of King Mahajit and the seekers of blessing on the eleventh lunar day of Shravana.</p>
+            <a href="/story/putrada-ekadashi" class="teaser-link">
+              Read the Story Behind the Day
+              <span class="material-symbols-outlined link-icon">arrow_forward</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg); /* Reduced gap to decrease vertical whitespace */
+  }
+
+  .demo-tag-container {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .demo-badge {
+    background-color: var(--color-tertiary-container);
+    color: var(--color-on-tertiary-container);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+  }
+
+  /* Hero Section styles */
+  .hero-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    align-items: start;
+  }
+
+  .hero-info {
+    width: 100%;
+  }
+
+  .date-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    line-height: 1.15;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .hero-tagline {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background-color: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    max-width: 450px;
+    width: 100%;
+  }
+
+  .search-icon {
+    color: var(--color-on-surface-variant);
+  }
+
+  .search-form {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .search-input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    color: var(--color-on-surface);
+    font-size: 0.875rem;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-on-surface-variant);
+    opacity: 0.7;
+  }
+
+  .search-input:focus {
+    outline: none;
+  }
+
+  .search-btn {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+
+  .search-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .hero-conversions {
+    width: 100%;
+  }
+
+  .divider {
+    border: 0;
+    border-top: 1px solid var(--color-outline-variant);
+    opacity: 0.5;
+  }
+
+  /* Two Column Feed styles */
+  .content-feed {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+
+  .observances-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .section-icon {
+    color: var(--color-primary);
+    font-size: 1.75rem !important;
+  }
+
+  .observances-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .spotlight-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .spotlight-card {
+    background-color: var(--color-surface-container-highest);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+  }
+
+  .spotlight-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .spotlight-text {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  .story-teaser-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .story-teaser-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 74, 63, 0.08);
+  }
+
+  .image-placeholder {
+    height: 150px;
+    background-color: var(--color-surface-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--color-outline-variant);
+  }
+
+  .placeholder-icon {
+    font-size: 3rem !important;
+    color: var(--color-outline-variant);
+  }
+
+  .teaser-content {
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .teaser-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .teaser-title {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+  }
+
+  .teaser-excerpt {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .teaser-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .teaser-link:hover {
+    text-decoration: underline;
+  }
+
+  .teaser-link .link-icon {
+    font-size: 0.9375rem !important;
+  }
+
+  @media (min-width: 768px) {
+    .hero-section {
+      flex-direction: row;
+    }
+
+    .hero-info {
+      width: 50%;
+    }
+
+    .hero-conversions {
+      width: 50%;
+    }
+
+    .date-title {
+      font-size: 3rem;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .content-feed {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,110 @@
+---
+---
+
+<footer class="footer">
+  <div class="container footer-container">
+    <div class="brand-group">
+      <div class="brand">CheckYourCalendar</div>
+      <p class="tagline">Understanding what today means across calendars, cultures, and traditions.</p>
+    </div>
+    
+    <nav class="footer-nav" aria-label="Footer Navigation">
+      <a href="/about" class="footer-link">About</a>
+      <a href="/about#methodology" class="footer-link">Methodology</a>
+      <a href="/privacy" class="footer-link">Privacy</a>
+      <a href="/terms" class="footer-link">Terms</a>
+      <a href="/contact" class="footer-link">Contact</a>
+    </nav>
+    
+    <div class="copyright">
+      &copy; {new Date().getFullYear()} CheckYourCalendar. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-surface-container-low);
+    border-top: 1px solid var(--color-outline);
+    padding: var(--spacing-xl) 0;
+    margin-top: auto;
+  }
+
+  .footer-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    align-items: center;
+    text-align: center;
+  }
+
+  .brand-group {
+    max-width: 400px;
+  }
+
+  .brand {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .tagline {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-md) var(--spacing-lg);
+  }
+
+  .footer-link {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface-variant);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .footer-link:hover {
+    color: var(--color-primary);
+  }
+
+  .copyright {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  @media (min-width: 768px) {
+    .footer-container {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+    }
+
+    .brand-group {
+      width: 100%;
+      max-width: none;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .footer-nav {
+      order: 1;
+      justify-content: flex-end;
+    }
+
+    .copyright {
+      order: 2;
+      width: 100%;
+      margin-top: var(--spacing-sm);
+    }
+  }
+</style>

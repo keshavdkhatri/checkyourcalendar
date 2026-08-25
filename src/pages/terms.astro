@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Terms of Service" description="Terms of service and usage guidelines for CheckYourCalendar.">
+  <Header />
+
+  <main class="container main-content">
+    <article class="editorial-article">
+      <header class="article-header">
+        <h1 class="article-title">Terms of Service</h1>
+        <p class="article-subtitle">Guidelines for site usage and information disclaimer</p>
+      </header>
+
+      <section class="article-body">
+        <p class="lead">
+          Welcome to CheckYourCalendar. By accessing our platform, you agree to follow the terms and disclaimers outlined below.
+        </p>
+
+        <h2>Accuracy Disclaimer</h2>
+        <p>
+          While we strive for absolute accuracy in calendar calculations, conversion logic, and cultural observances, CheckYourCalendar is provided for informational and educational purposes only. Because timekeeping systems can vary by astronomical calculation methods and local sighting authorities, minor discrepancies can exist.
+        </p>
+
+        <h2>Content Ownership</h2>
+        <p>
+          All editorial content, custom stories ("Story Behind the Day"), design templates, and layouts are the intellectual property of CheckYourCalendar. You may share links to our pages and reference short excerpts with appropriate attribution, but mass scraping or copying of our content is prohibited.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          If you have questions or wish to report a calculation discrepancy, please contact us through our Contact page or at <strong>inquiries@checkyourcalendar.com</strong>.
+        </p>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .editorial-article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    line-height: 1.15;
+  }
+
+  .article-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-xs);
+  }
+
+  .article-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .article-body h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-top: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .article-body p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+  }
+</style>

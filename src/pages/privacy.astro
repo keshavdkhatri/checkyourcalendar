@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Privacy Policy" description="Privacy policy and data collection disclosures for CheckYourCalendar.">
+  <Header />
+
+  <main class="container main-content">
+    <article class="editorial-article">
+      <header class="article-header">
+        <h1 class="article-title">Privacy Policy</h1>
+        <p class="article-subtitle">Data collection, tracking, and cookie usage disclosures</p>
+      </header>
+
+      <section class="article-body">
+        <p class="lead">
+          Your privacy is important to us. CheckYourCalendar does not collect personal information, track users, or store cookies for core functionality.
+        </p>
+
+        <h2>Cookie-Free Analytics</h2>
+        <p>
+          We use <strong>Cloudflare Web Analytics</strong> to measure site performance, page popularity, and traffic volumes. This analytics solution is privacy-respecting and completely cookie-free. It does not track individual users or compile cross-site profiles.
+        </p>
+
+        <h2>Data Security</h2>
+        <p>
+          Since CheckYourCalendar operates statically without user accounts, databases, or user-submitted content, there is no storage of personal credentials or profiles that could be subject to unauthorized access.
+        </p>
+
+        <h2>Future Changes</h2>
+        <p>
+          If we introduce optional features in the future that require cookies or user consent (such as search personalization, subscription newsletters, or ads), we will update this policy and provide a clear consent mechanism before launch.
+        </p>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .editorial-article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    line-height: 1.15;
+  }
+
+  .article-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-xs);
+  }
+
+  .article-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .article-body h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-top: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .article-body p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+  }
+</style>

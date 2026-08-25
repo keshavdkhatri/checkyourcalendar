@@ -1,0 +1,394 @@
+---
+interface Props {
+  activeTab?: 'today' | 'calendars' | 'observances' | 'stories' | 'about' | 'search' | 'contact';
+}
+
+const { activeTab } = Astro.props;
+---
+
+<header class="header">
+  <div class="container header-container">
+    <!-- Brand Logo -->
+    <a href="/" class="brand" aria-label="CheckYourCalendar home">
+      CheckYourCalendar
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="nav-desktop" aria-label="Main Navigation">
+      <a href="/" class={`nav-link ${activeTab === 'today' ? 'active' : ''}`}>
+        Today
+      </a>
+      <a href="/calendars" class={`nav-link ${activeTab === 'calendars' ? 'active' : ''}`}>
+        Calendars
+      </a>
+      <a href="/observances" class={`nav-link ${activeTab === 'observances' ? 'active' : ''}`}>
+        Observances
+      </a>
+      <a href="/stories" class={`nav-link ${activeTab === 'stories' ? 'active' : ''}`}>
+        Stories
+      </a>
+      <a href="/about" class={`nav-link ${activeTab === 'about' ? 'active' : ''}`}>
+        About
+      </a>
+    </nav>
+
+    <!-- Desktop Search (hidden on mobile, visible on desktop) -->
+    <form action="/search" method="GET" class="header-search-form desktop-search">
+      <label for="header-search-desktop" class="visually-hidden">Search dates, festivals, calendars...</label>
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input 
+        type="search" 
+        id="header-search-desktop" 
+        name="q" 
+        placeholder="Search dates, festivals, calendars..." 
+        class="header-search-input"
+        required
+      />
+    </form>
+
+    <!-- Header Actions -->
+    <div class="actions">
+      <!-- Mobile Search Toggle Button -->
+      <button class="mobile-search-toggle" aria-expanded="false" aria-controls="mobile-search-bar" aria-label="Toggle search bar">
+        <span class="material-symbols-outlined search-icon">search</span>
+      </button>
+      
+      <!-- Mobile Menu Toggle Button -->
+      <button class="mobile-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle navigation menu">
+        <span class="material-symbols-outlined menu-icon">menu</span>
+        <span class="material-symbols-outlined close-icon">close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Search Bar (Toggled on mobile) -->
+  <div id="mobile-search-bar" class="mobile-search-container" hidden>
+    <div class="container">
+      <form action="/search" method="GET" class="header-search-form mobile-search-form">
+        <label for="header-search-mobile" class="visually-hidden">Search dates, festivals, calendars...</label>
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input 
+          type="search" 
+          id="header-search-mobile" 
+          name="q" 
+          placeholder="Search dates, festivals, calendars..." 
+          class="header-search-input"
+          required
+        />
+        <button type="submit" class="mobile-search-submit">Go</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Panel -->
+  <nav id="mobile-nav" class="nav-mobile" aria-label="Mobile Navigation" hidden>
+    <a href="/" class={`mobile-link ${activeTab === 'today' ? 'active' : ''}`}>
+      Today
+    </a>
+    <a href="/calendars" class={`mobile-link ${activeTab === 'calendars' ? 'active' : ''}`}>
+      Calendars
+    </a>
+    <a href="/observances" class={`mobile-link ${activeTab === 'observances' ? 'active' : ''}`}>
+      Observances
+    </a>
+    <a href="/stories" class={`mobile-link ${activeTab === 'stories' ? 'active' : ''}`}>
+      Stories
+    </a>
+    <a href="/about" class={`mobile-link ${activeTab === 'about' ? 'active' : ''}`}>
+      About
+    </a>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector('.mobile-toggle');
+  const mobileNav = document.querySelector('.nav-mobile');
+  const searchToggle = document.querySelector('.mobile-search-toggle');
+  const mobileSearch = document.querySelector('.mobile-search-container');
+  
+  if (toggle && mobileNav) {
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      mobileNav.toggleAttribute('hidden');
+      
+      // Close search if opening menu
+      if (!expanded && mobileSearch && !mobileSearch.hasAttribute('hidden')) {
+        mobileSearch.setAttribute('hidden', '');
+        searchToggle?.setAttribute('aria-expanded', 'false');
+      }
+      
+      if (!expanded) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  if (searchToggle && mobileSearch) {
+    searchToggle.addEventListener('click', () => {
+      const expanded = searchToggle.getAttribute('aria-expanded') === 'true';
+      searchToggle.setAttribute('aria-expanded', String(!expanded));
+      mobileSearch.toggleAttribute('hidden');
+      
+      // Close menu if opening search
+      if (!expanded && mobileNav && !mobileNav.hasAttribute('hidden')) {
+        mobileNav.setAttribute('hidden', '');
+        toggle?.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+      
+      if (!expanded) {
+        const input = mobileSearch.querySelector('input');
+        input?.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .header {
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-outline-variant);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+  }
+
+  .brand {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .brand:hover {
+    opacity: 0.85;
+  }
+
+  .nav-desktop {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  .nav-link {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-on-surface-variant);
+    padding: var(--spacing-xs) 0;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-link:hover {
+    color: var(--color-primary);
+  }
+
+  .nav-link.active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  /* Visually Hidden utility for a11y labels */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  /* Search form styling */
+  .header-search-form {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: 6px var(--spacing-sm);
+    width: 100%;
+  }
+
+  .header-search-form:focus-within {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface);
+  }
+
+  .header-search-input {
+    border: none;
+    background: transparent;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface);
+    width: 100%;
+    outline: none;
+  }
+
+  .header-search-input::placeholder {
+    color: var(--color-on-surface-variant);
+    opacity: 0.7;
+  }
+
+  .search-icon {
+    color: var(--color-on-surface-variant);
+    font-size: 1.125rem !important;
+  }
+
+  /* Desktop search specific */
+  .desktop-search {
+    display: none;
+    max-width: 280px;
+    margin: 0 var(--spacing-md);
+  }
+
+  /* Mobile search toggle */
+  .mobile-search-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mobile-search-toggle:hover {
+    background-color: var(--color-surface-container-low);
+  }
+
+  .mobile-search-toggle[aria-expanded="true"] {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  /* Mobile search input container */
+  .mobile-search-container {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding: var(--spacing-sm) 0;
+    z-index: 98;
+  }
+
+  .mobile-search-form {
+    background-color: var(--color-surface-dim);
+  }
+
+  .mobile-search-submit {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .mobile-toggle:hover {
+    background-color: var(--color-surface-container-low);
+  }
+
+  .mobile-toggle[aria-expanded="true"] .menu-icon {
+    display: none;
+  }
+
+  .mobile-toggle[aria-expanded="false"] .close-icon {
+    display: none;
+  }
+
+  /* Mobile Navigation Styles */
+  .nav-mobile {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 80px);
+    background-color: var(--color-background);
+    padding: var(--spacing-lg);
+    gap: var(--spacing-md);
+    z-index: 99;
+  }
+
+  .mobile-link {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-on-background);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-outline);
+  }
+
+  .mobile-link:hover, .mobile-link.active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  @media (min-width: 768px) {
+    .nav-desktop {
+      display: flex;
+    }
+    
+    .mobile-toggle {
+      display: none;
+    }
+
+    .nav-mobile {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .desktop-search {
+      display: flex;
+    }
+
+    .mobile-search-toggle {
+      display: none;
+    }
+
+    .mobile-search-container {
+      display: none !important;
+    }
+  }
+</style>

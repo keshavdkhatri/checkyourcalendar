@@ -1,0 +1,106 @@
+---
+interface CalendarConversion {
+  name: string;
+  dateString: string;
+  calendarId: string;
+}
+
+interface Props {
+  conversions: CalendarConversion[];
+}
+
+const { conversions } = Astro.props;
+
+// Separate the primary/large calendar item (Indian National Saka, for example) or keep all 5 balanced.
+// We can display the first 4 in a 2x2 grid, and the 5th spans full-width or fits beautifully.
+---
+
+<div class="calendar-bento-grid">
+  {conversions.map((conv, idx) => {
+    // If it's the last one and the total count is odd, make it span full-width.
+    const isLastAndOdd = idx === conversions.length - 1 && conversions.length % 2 !== 0;
+    return (
+      <div class={`grid-item ${isLastAndOdd ? 'span-full' : ''}`}>
+        <div class="header-group">
+          <span class="calendar-name">{conv.name}</span>
+        </div>
+        <div class="converted-date">{conv.dateString}</div>
+        <a href={`/calendars#${conv.calendarId}`} class="explore-link" aria-label={`Learn how the ${conv.name} works`}>
+          How this calendar works &rarr;
+        </a>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .calendar-bento-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+    width: 100%;
+  }
+
+  .grid-item {
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .grid-item:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-container-low);
+  }
+
+  .calendar-name {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .converted-date {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: var(--spacing-xs) 0 var(--spacing-sm);
+  }
+
+  .explore-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    align-self: flex-start;
+  }
+
+  .explore-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .explore-link .icon {
+    font-size: 0.875rem !important;
+  }
+
+  @media (min-width: 576px) {
+    .calendar-bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .span-full {
+      grid-column: span 2;
+    }
+  }
+</style>

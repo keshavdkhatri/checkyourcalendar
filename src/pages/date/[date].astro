@@ -1,0 +1,185 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import DateCompareGrid from '../../components/DateCompareGrid.astro';
+import ObservanceCard from '../../components/ObservanceCard.astro';
+import { mockConversions, mockObservances } from '../../data/mockData';
+
+export async function getStaticPaths() {
+  return [
+    { params: { date: '2026-08-24' } },
+    { params: { date: '2026-08-21' } }
+  ];
+}
+
+const { date } = Astro.params;
+
+// Handle the active dates with custom mock mappings
+const dateTitleMap: Record<string, string> = {
+  '2026-08-24': 'Monday, August 24, 2026',
+  '2026-08-21': 'Friday, August 21, 2026'
+};
+
+const dateTitle = dateTitleMap[date] || date;
+
+// Map appropriate conversions based on date
+const dateConversions = date === '2026-08-21' ? [
+  { name: 'Vikram Samvat (Gujarati/Hindu)', dateString: 'Bhadrapada Sud 8, 2082', calendarId: 'hindu-vikram' },
+  { name: 'Hijri (Islamic)', dateString: 'Safar 7, 1448', calendarId: 'islamic-civil' },
+  { name: 'Hebrew', dateString: 'Elul 8, 5786', calendarId: 'hebrew' },
+  { name: 'Persian (Solar Hijri)', dateString: 'Mordad 30, 1405', calendarId: 'persian' },
+  { name: 'Indian National (Saka)', dateString: 'Sravana 30, 1948', calendarId: 'indian-saka' },
+] : mockConversions;
+
+// Map appropriate observances based on date
+const dateObservances = date === '2026-08-21' ? [
+  mockObservances[1] // International Day of Remembrance
+] : [
+  mockObservances[0] // Shravan Putrada Ekadashi
+];
+---
+
+<Layout title={dateTitle} description={`Explore calendar conversions and cultural observances for the date ${dateTitle}.`}>
+  <Header />
+
+  <!-- Breadcrumbs -->
+  <nav class="container breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>Date Detail</li>
+    </ol>
+  </nav>
+
+  <main class="container main-content">
+    <section class="date-header">
+      <h1 class="date-title">{dateTitle}</h1>
+      <p class="date-subtitle">Global conversions and observances occurring on this date</p>
+    </section>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      <!-- Conversions -->
+      <div class="conversions-column">
+        <h2 class="section-title">Calendar Conversions</h2>
+        <DateCompareGrid conversions={dateConversions} />
+      </div>
+
+      <!-- Observances occurring today -->
+      <div class="observances-column">
+        <h2 class="section-title">Observances on this Date</h2>
+        <div class="observances-list">
+          {dateObservances.map(obs => (
+            <ObservanceCard 
+              id={obs.id}
+              name={obs.name}
+              type={obs.type}
+              calendarName={obs.calendarName}
+              regionName={obs.regionName}
+              summary={obs.summary}
+              storyRef={obs.storyRef}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .breadcrumbs {
+    padding-top: var(--spacing-md);
+    padding-bottom: 0;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .breadcrumb-item a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .breadcrumb-item.active {
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .separator {
+    font-size: 1rem !important;
+    margin: 0 4px;
+    color: var(--color-outline-variant);
+  }
+
+  .main-content {
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+
+  .date-header {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .date-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    line-height: 1.2;
+  }
+
+  .date-subtitle {
+    font-size: 1rem;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-xs);
+  }
+
+  /* Grid details */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--color-on-surface);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .conversions-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .observances-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .observances-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  @media (min-width: 992px) {
+    .content-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
