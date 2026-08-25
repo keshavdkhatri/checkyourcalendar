@@ -4,40 +4,62 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import DateCompareGrid from '../../components/DateCompareGrid.astro';
 import ObservanceCard from '../../components/ObservanceCard.astro';
-import { mockConversions, mockObservances } from '../../data/mockData';
+import { CalendarRegistry } from '../../engines/calendar/registry';
+import { ObservanceEngine } from '../../engines/observance/engine';
 
 export async function getStaticPaths() {
-  return [
-    { params: { date: '2026-08-24' } },
-    { params: { date: '2026-08-21' } }
-  ];
+  const paths = [];
+  const start = new Date(2026, 0, 1);
+  const end = new Date(2026, 11, 31);
+  
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${day}`;
+    paths.push({ params: { date: dateStr } });
+  }
+  return paths;
 }
 
 const { date } = Astro.params;
 
-// Handle the active dates with custom mock mappings
-const dateTitleMap: Record<string, string> = {
-  '2026-08-24': 'Monday, August 24, 2026',
-  '2026-08-21': 'Friday, August 21, 2026'
+// Parse the date (YYYY-MM-DD)
+const [yearStr, monthStr, dayStr] = date.split('-');
+const parsedDate = {
+  year: parseInt(yearStr, 10),
+  month: parseInt(monthStr, 10),
+  day: parseInt(dayStr, 10)
 };
 
-const dateTitle = dateTitleMap[date] || date;
+const jsDate = new Date(parsedDate.year, parsedDate.month - 1, parsedDate.day);
+const dateTitle = new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(jsDate);
 
-// Map appropriate conversions based on date
-const dateConversions = date === '2026-08-21' ? [
-  { name: 'Vikram Samvat (Gujarati/Hindu)', dateString: 'Bhadrapada Sud 8, 2082', calendarId: 'hindu-vikram' },
-  { name: 'Hijri (Islamic)', dateString: 'Safar 7, 1448', calendarId: 'islamic-civil' },
-  { name: 'Hebrew', dateString: 'Elul 8, 5786', calendarId: 'hebrew' },
-  { name: 'Persian (Solar Hijri)', dateString: 'Mordad 30, 1405', calendarId: 'persian' },
-  { name: 'Indian National (Saka)', dateString: 'Sravana 30, 1948', calendarId: 'indian-saka' },
-] : mockConversions;
+const conversionsMap = CalendarRegistry.convert(parsedDate);
+const dateConversions = Object.values(conversionsMap)
+  .filter(c => c.calendar !== 'gregorian')
+  .map(c => {
+    const adapter = CalendarRegistry.getAdapter(c.calendar)!;
+    return {
+      calendarId: c.calendar,
+      name: adapter.name,
+      dateString: adapter.format(c)
+    };
+  });
 
-// Map appropriate observances based on date
-const dateObservances = date === '2026-08-21' ? [
-  mockObservances[1] // International Day of Remembrance
-] : [
-  mockObservances[0] // Shravan Putrada Ekadashi
-];
+const matchedObservances = ObservanceEngine.getObservancesForDate(parsedDate);
+const dateObservances = matchedObservances.map(obs => {
+  const adapter = CalendarRegistry.getAdapter(obs.calendar)!;
+  return {
+    id: obs.id,
+    name: obs.name,
+    type: obs.type,
+    calendarName: adapter.name,
+    regionName: obs.regions.join(', ') || 'Global',
+    summary: obs.shortDescription,
+    storyRef: obs.storyRef
+  };
+});
 ---
 
 <Layout title={dateTitle} description={`Explore calendar conversions and cultural observances for the date ${dateTitle}.`}>
@@ -69,17 +91,21 @@ const dateObservances = date === '2026-08-21' ? [
       <div class="observances-column">
         <h2 class="section-title">Observances on this Date</h2>
         <div class="observances-list">
-          {dateObservances.map(obs => (
-            <ObservanceCard 
-              id={obs.id}
-              name={obs.name}
-              type={obs.type}
-              calendarName={obs.calendarName}
-              regionName={obs.regionName}
-              summary={obs.summary}
-              storyRef={obs.storyRef}
-            />
-          ))}
+          {dateObservances.length > 0 ? (
+            dateObservances.map(obs => (
+              <ObservanceCard 
+                id={obs.id}
+                name={obs.name}
+                type={obs.type}
+                calendarName={obs.calendarName}
+                regionName={obs.regionName}
+                summary={obs.summary}
+                storyRef={obs.storyRef}
+              />
+            ))
+          ) : (
+            <p class="no-observances">No major cultural observances recorded for this date.</p>
+          )}
         </div>
       </div>
     </div>
@@ -175,6 +201,12 @@ const dateObservances = date === '2026-08-21' ? [
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+  }
+
+  .no-observances {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    font-style: italic;
   }
 
   @media (min-width: 992px) {

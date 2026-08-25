@@ -4,9 +4,40 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DateCompareGrid from '../components/DateCompareGrid.astro';
 import ObservanceCard from '../components/ObservanceCard.astro';
-import { mockConversions, mockObservances } from '../data/mockData';
+import { CalendarRegistry } from '../engines/calendar/registry';
+import { ObservanceEngine } from '../engines/observance/engine';
 
-const todayGregorian = "Monday, August 24, 2026";
+// Default reference date: August 24, 2026
+const defaultDate = { year: 2026, month: 8, day: 24 };
+
+const jsDate = new Date(defaultDate.year, defaultDate.month - 1, defaultDate.day);
+const todayGregorian = new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(jsDate);
+
+const conversionsMap = CalendarRegistry.convert(defaultDate);
+const conversions = Object.values(conversionsMap)
+  .filter(c => c.calendar !== 'gregorian')
+  .map(c => {
+    const adapter = CalendarRegistry.getAdapter(c.calendar)!;
+    return {
+      calendarId: c.calendar,
+      name: adapter.name,
+      dateString: adapter.format(c)
+    };
+  });
+
+const matchedObservances = ObservanceEngine.getObservancesForDate(defaultDate);
+const observances = matchedObservances.map(obs => {
+  const adapter = CalendarRegistry.getAdapter(obs.calendar)!;
+  return {
+    id: obs.id,
+    name: obs.name,
+    type: obs.type,
+    calendarName: adapter.name,
+    regionName: obs.regions.join(', ') || 'Global',
+    summary: obs.shortDescription,
+    storyRef: obs.storyRef
+  };
+});
 ---
 
 <Layout title="Home - Today's Meaning Across Calendars">
@@ -25,10 +56,10 @@ const todayGregorian = "Monday, August 24, 2026";
         <!-- Date Lookup Selector -->
         <div class="search-box">
           <span class="material-symbols-outlined search-icon">calendar_month</span>
-          <form class="search-form" action="/date/" method="GET">
+          <form class="search-form" id="date-lookup-form">
             <input 
               type="text" 
-              name="d" 
+              id="date-lookup-input"
               class="search-input" 
               placeholder="Explore another date... (e.g., YYYY-MM-DD)" 
               aria-label="Explore another date"
@@ -41,7 +72,7 @@ const todayGregorian = "Monday, August 24, 2026";
 
       <!-- Bento Grid Conversions -->
       <div class="hero-conversions">
-        <DateCompareGrid conversions={mockConversions} />
+        <DateCompareGrid conversions={conversions} />
       </div>
     </section>
 
@@ -55,17 +86,21 @@ const todayGregorian = "Monday, August 24, 2026";
           Today's Observances
         </h2>
         <div class="observances-list">
-          {mockObservances.map(obs => (
-            <ObservanceCard 
-              id={obs.id}
-              name={obs.name}
-              type={obs.type}
-              calendarName={obs.calendarName}
-              regionName={obs.regionName}
-              summary={obs.summary}
-              storyRef={obs.storyRef}
-            />
-          ))}
+          {observances.length > 0 ? (
+            observances.map(obs => (
+              <ObservanceCard 
+                id={obs.id}
+                name={obs.name}
+                type={obs.type}
+                calendarName={obs.calendarName}
+                regionName={obs.regionName}
+                summary={obs.summary}
+                storyRef={obs.storyRef}
+              />
+            ))
+          ) : (
+            <p class="no-observances">No major cultural observances recorded for today.</p>
+          )}
         </div>
       </div>
 
@@ -104,13 +139,29 @@ const todayGregorian = "Monday, August 24, 2026";
   <Footer />
 </Layout>
 
+<script>
+  const form = document.getElementById('date-lookup-form');
+  const input = document.getElementById('date-lookup-input') as HTMLInputElement | null;
+  if (form && input) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        window.location.href = `/date/${val}`;
+      } else {
+        alert('Please enter a valid Gregorian date in YYYY-MM-DD format (within 2026).');
+      }
+    });
+  }
+</script>
+
 <style>
   .main-content {
     padding-top: var(--spacing-xl);
     padding-bottom: var(--spacing-xl);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg); /* Reduced gap to decrease vertical whitespace */
+    gap: var(--spacing-lg);
   }
 
   .demo-tag-container {
@@ -257,6 +308,12 @@ const todayGregorian = "Monday, August 24, 2026";
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+  }
+
+  .no-observances {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    font-style: italic;
   }
 
   .spotlight-column {

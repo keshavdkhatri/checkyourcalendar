@@ -3,7 +3,22 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ObservanceCard from '../components/ObservanceCard.astro';
-import { mockObservances } from '../data/mockData';
+import { ObservanceEngine } from '../engines/observance/engine';
+import { CalendarRegistry } from '../engines/calendar/registry';
+
+const allObservances = ObservanceEngine.getAllObservances();
+const observances = allObservances.map(obs => {
+  const adapter = CalendarRegistry.getAdapter(obs.calendar)!;
+  return {
+    id: obs.id,
+    name: obs.name,
+    type: obs.type,
+    calendarName: adapter.name,
+    regionName: obs.regions.join(', ') || 'Global',
+    summary: obs.shortDescription,
+    storyRef: obs.storyRef
+  };
+});
 ---
 
 <Layout title="Observances - Directory" description="Explore the global calendar of festivals, fasting days, holy days, and commemorations.">
@@ -31,7 +46,7 @@ import { mockObservances } from '../data/mockData';
 
     <!-- Observances list -->
     <section class="observances-grid">
-      {mockObservances.map(obs => (
+      {observances.map(obs => (
         <ObservanceCard 
           id={obs.id}
           name={obs.name}

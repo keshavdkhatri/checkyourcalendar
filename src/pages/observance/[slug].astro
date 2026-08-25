@@ -2,16 +2,18 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { mockObservances } from '../../data/mockData';
+import { ObservanceEngine } from '../../engines/observance/engine';
+import { CalendarRegistry } from '../../engines/calendar/registry';
 
 export async function getStaticPaths() {
-  return mockObservances.map(obs => ({
+  const observances = ObservanceEngine.getAllObservances();
+  return observances.map(obs => ({
     params: { slug: obs.id },
   }));
 }
 
 const { slug } = Astro.params;
-const observance = mockObservances.find(obs => obs.id === slug);
+const observance = ObservanceEngine.getObservanceById(slug);
 
 if (!observance) {
   return Astro.redirect('/404');
@@ -27,9 +29,10 @@ const typeLabelMap: Record<string, string> = {
 };
 
 const typeLabel = typeLabelMap[observance.type] || observance.type;
+const adapter = CalendarRegistry.getAdapter(observance.calendar)!;
 ---
 
-<Layout title={observance.name} description={observance.summary}>
+<Layout title={observance.name} description={observance.shortDescription}>
   <Header activeTab="observances" />
 
   <!-- Breadcrumbs -->
@@ -53,7 +56,7 @@ const typeLabel = typeLabelMap[observance.type] || observance.type;
         <div class="info-column">
           <section class="section-box">
             <h2 class="section-title">About the Observance</h2>
-            <p class="summary-text">{observance.summary}</p>
+            <p class="summary-text">{observance.shortDescription}</p>
           </section>
 
           <section class="section-box">
@@ -61,11 +64,11 @@ const typeLabel = typeLabelMap[observance.type] || observance.type;
             <div class="calendar-info-box">
               <div class="info-row">
                 <span class="info-label">Calendar System</span>
-                <span class="info-val">{observance.calendarName}</span>
+                <span class="info-val">{adapter.name}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Region celebrated</span>
-                <span class="info-val">{observance.regionName}</span>
+                <span class="info-val">{observance.regions.join(', ') || 'Global'}</span>
               </div>
             </div>
           </section>
