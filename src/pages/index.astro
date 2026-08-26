@@ -7,8 +7,19 @@ import ObservanceCard from '../components/ObservanceCard.astro';
 import { CalendarRegistry } from '../engines/calendar/registry';
 import { ObservanceEngine } from '../engines/observance/engine';
 
-// Default reference date: August 24, 2026
-const defaultDate = { year: 2026, month: 8, day: 24 };
+// Default reference date computed at build time (bounded to 2026 range)
+const buildDate = new Date();
+let buildYear = buildDate.getFullYear();
+let buildMonth = buildDate.getMonth() + 1;
+let buildDay = buildDate.getDate();
+
+if (buildYear !== 2026) {
+  buildYear = 2026;
+  buildMonth = 8;
+  buildDay = 26;
+}
+
+const defaultDate = { year: buildYear, month: buildMonth, day: buildDay };
 
 const jsDate = new Date(defaultDate.year, defaultDate.month - 1, defaultDate.day);
 const todayGregorian = new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(jsDate);
@@ -55,15 +66,16 @@ const observances = matchedObservances.map(obs => {
         
         <!-- Date Lookup Selector -->
         <div class="search-box">
-          <span class="material-symbols-outlined search-icon">calendar_month</span>
+          <span class="material-symbols-outlined search-icon" id="calendar-icon-trigger" style="cursor: pointer;">calendar_month</span>
           <form class="search-form" id="date-lookup-form">
             <input 
-              type="text" 
+              type="date" 
               id="date-lookup-input"
               class="search-input" 
-              placeholder="Explore another date... (e.g., YYYY-MM-DD)" 
               aria-label="Explore another date"
-              value="2026-08-24"
+              min="2026-01-01"
+              max="2026-12-31"
+              value={`${defaultDate.year}-${String(defaultDate.month).padStart(2, '0')}-${String(defaultDate.day).padStart(2, '0')}`}
             />
             <button type="submit" class="search-btn">Go</button>
           </form>
@@ -140,19 +152,145 @@ const observances = matchedObservances.map(obs => {
 </Layout>
 
 <script>
-  const form = document.getElementById('date-lookup-form');
-  const input = document.getElementById('date-lookup-input') as HTMLInputElement | null;
-  if (form && input) {
+  async function initHomepage() {
+    const form = document.getElementById('date-lookup-form');
+    const input = document.getElementById('date-lookup-input') as HTMLInputElement | null;
+    if (!form || !input) return;
+
+    // 1. Determine local today's date in YYYY-MM-DD
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let day = now.getDate();
+
+    // Bound to 2026 since that is the supported static range
+    if (year !== 2026) {
+      year = 2026;
+      month = 8;
+      day = 26;
+    }
+
+    const todayStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // Set value of date input
+    input.value = todayStr;
+
+    // 2. Fetch conversions and observances for today
+    try {
+      const response = await fetch(`/date/${todayStr}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const html = await response.text();
+      
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Update date title
+      const newTitle = doc.querySelector('.date-title');
+      const currentTitle = document.querySelector('.date-title');
+      if (newTitle && currentTitle) {
+        currentTitle.textContent = newTitle.textContent;
+      }
+      
+      // Update conversions grid
+      const newBentoGrid = doc.querySelector('.calendar-bento-grid');
+      const currentHeroConversions = document.querySelector('.hero-conversions');
+      if (newBentoGrid && currentHeroConversions) {
+        currentHeroConversions.innerHTML = '';
+        currentHeroConversions.appendChild(newBentoGrid);
+      }
+      
+      // Update observances list
+      const newObservancesList = doc.querySelector('.observances-list');
+      const currentObservancesList = document.querySelector('.observances-list');
+      if (newObservancesList && currentObservancesList) {
+        currentObservancesList.innerHTML = newObservancesList.innerHTML;
+      }
+      
+      // 3. Update the Spotlight section dynamically
+      const spotlightText = document.querySelector('.spotlight-text');
+      const storyTeaserCard = document.querySelector('.story-teaser-card') as HTMLElement | null;
+      
+      if (todayStr === '2026-08-24') {
+        // Restore/keep original August 24 content if today is indeed August 24
+        if (spotlightText) {
+          spotlightText.textContent = `Today marks a unique intersection in celestial timekeeping. The 11th tithi (Ekadashi) in the lunar cycle coincides with the late summer monsoon transition in South Asia, a period historically associated with purification and renewal. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles and spiritual milestones.`;
+        }
+        if (storyTeaserCard) {
+          storyTeaserCard.style.display = '';
+          const teaserTitle = storyTeaserCard.querySelector('.teaser-title');
+          const teaserExcerpt = storyTeaserCard.querySelector('.teaser-excerpt');
+          const teaserLink = storyTeaserCard.querySelector('.teaser-link') as HTMLAnchorElement | null;
+          if (teaserTitle) teaserTitle.textContent = 'The Legend of Putrada Ekadashi';
+          if (teaserExcerpt) teaserExcerpt.textContent = 'The ancient narrative of King Mahajit and the seekers of blessing on the eleventh lunar day of Shravana.';
+          if (teaserLink) teaserLink.href = '/story/putrada-ekadashi';
+        }
+      } else {
+        // Show generic spotlight text for other dates
+        if (spotlightText) {
+          spotlightText.textContent = `Today marks a unique intersection in celestial timekeeping. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles, astronomical alignments, and spiritual milestones across cultures.`;
+        }
+        
+        // Find if there is a story link in the new observances
+        const storyLink = newObservancesList?.querySelector('.story-link, .title-link') as HTMLAnchorElement | null;
+        if (storyLink && storyTeaserCard) {
+          storyTeaserCard.style.display = '';
+          const href = storyLink.getAttribute('href') || '';
+          
+          // Get details from the card
+          const card = storyLink.closest('.observance-card');
+          const cardTitle = card?.querySelector('.observance-title')?.textContent?.trim() || '';
+          const cardSummary = card?.querySelector('.summary')?.textContent?.trim() || '';
+          
+          const teaserTitle = storyTeaserCard.querySelector('.teaser-title');
+          const teaserExcerpt = storyTeaserCard.querySelector('.teaser-excerpt');
+          const teaserLink = storyTeaserCard.querySelector('.teaser-link') as HTMLAnchorElement | null;
+          
+          if (teaserTitle) teaserTitle.textContent = cardTitle;
+          if (teaserExcerpt) teaserExcerpt.textContent = cardSummary;
+          if (teaserLink) teaserLink.href = href;
+        } else if (storyTeaserCard) {
+          // Hide teaser card if no stories for today
+          storyTeaserCard.style.display = 'none';
+        }
+      }
+      
+    } catch (err) {
+      console.error('Error fetching today\'s date data:', err);
+    }
+
+    // 4. Custom calendar icon click trigger
+    const trigger = document.getElementById('calendar-icon-trigger');
+    if (trigger) {
+      trigger.addEventListener('click', () => {
+        try {
+          if (typeof input.showPicker === 'function') {
+            input.showPicker();
+          } else {
+            input.focus();
+            input.click();
+          }
+        } catch (e) {
+          console.warn('showPicker failed, falling back:', e);
+          input.focus();
+          input.click();
+        }
+      });
+    }
+
+    // 5. Form Submit navigation logic
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const val = input.value.trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+      if (/^2026-\d{2}-\d{2}$/.test(val)) {
         window.location.href = `/date/${val}`;
       } else {
-        alert('Please enter a valid Gregorian date in YYYY-MM-DD format (within 2026).');
+        alert('Please select a date within the year 2026.');
       }
     });
   }
+
+  // Run initialisation
+  initHomepage();
 </script>
 
 <style>
@@ -237,6 +375,12 @@ const observances = matchedObservances.map(obs => {
     width: 100%;
     color: var(--color-on-surface);
     font-size: 0.875rem;
+  }
+
+  /* Hide the native calendar picker indicator */
+  .search-input::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
   }
 
   .search-input::placeholder {
