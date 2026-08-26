@@ -10,10 +10,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run"
   },
   "dependencies": {
-    "astro": "^7.2.6"
+    "astro": "^7.2.6",
+    "panchang-ts": "^5.1.1"
   },
   "allowScripts": {
     "esbuild": true

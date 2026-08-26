@@ -7,13 +7,11 @@ export const observanceRules: Observance[] = [
     type: ObservanceType.FAST,
     calendar: 'hindu-vikram',
     dateRule: {
-      type: 'fixed-calendar',
-      calendar: 'hindu-vikram',
-      calendarMonth: 10, // Shravan
-      calendarDay: 11   // Sud 11 (day 11 of the lunar month start offset)
+      type: 'calculated',
+      calculationRef: 'shravana-putrada-ekadashi'
     },
     regions: ['Western India', 'Gujarat'],
-    traditions: ['Hindu (Vaishnava)'],
+    traditions: ['Hindu (Smarta / Vaishnava)'],
     communities: ['Gujarati'],
     isPublicHoliday: false,
     countries: [],
@@ -30,7 +28,7 @@ export const observanceRules: Observance[] = [
     ],
     storyRef: 'putrada-ekadashi',
     relatedObservances: [],
-    shortDescription: 'A significant fasting day dedicated to Lord Vishnu, observed on the 11th lunar day of the bright fortnight. It is traditionally observed for the well-being, prosperity, and longevity of children.',
+    shortDescription: 'A significant fasting day dedicated to Lord Vishnu, observed on the 11th lunar day of the bright fortnight of Shravana. Smarta and Vaishnava traditions observe it on separate days according to sunrise and tithi boundaries.',
     tags: ['fast', 'shravan', 'ekadashi', 'vishnu']
   },
   {

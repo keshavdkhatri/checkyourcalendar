@@ -3,14 +3,24 @@ import { ObservanceEngine } from './engine';
 import type { GregorianDate } from '../calendar/types';
 
 describe('Observance Engine Verification', () => {
-  it('should match Shravan Putrada Ekadashi on August 24, 2026', () => {
+  it('should match Smarta Shravan Putrada Ekadashi on August 23, 2026', () => {
+    const date: GregorianDate = { year: 2026, month: 8, day: 23 };
+    const matches = ObservanceEngine.getObservancesForDate(date);
+    
+    expect(matches.length).toBeGreaterThan(0);
+    const ekadashi = matches.find(m => m.id === 'putrada-ekadashi');
+    expect(ekadashi).toBeDefined();
+    expect(ekadashi?.name).toBe('Smarta Shravan Putrada Ekadashi');
+  });
+
+  it('should match Vaishnava Shravan Putrada Ekadashi on August 24, 2026', () => {
     const date: GregorianDate = { year: 2026, month: 8, day: 24 };
     const matches = ObservanceEngine.getObservancesForDate(date);
     
     expect(matches.length).toBeGreaterThan(0);
     const ekadashi = matches.find(m => m.id === 'putrada-ekadashi');
     expect(ekadashi).toBeDefined();
-    expect(ekadashi?.name).toBe('Shravan Putrada Ekadashi');
+    expect(ekadashi?.name).toBe('Vaishnava Shravan Putrada Ekadashi');
   });
 
   it('should match Remembrance Day for Victims of Terrorism on August 21, 2026', () => {
