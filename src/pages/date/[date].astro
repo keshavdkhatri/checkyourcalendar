@@ -60,6 +60,16 @@ const dateObservances = matchedObservances.map(obs => {
     storyRef: obs.storyRef
   };
 });
+
+const prevDate = new Date(parsedDate.year, parsedDate.month - 1, parsedDate.day - 1);
+const nextDate = new Date(parsedDate.year, parsedDate.month - 1, parsedDate.day + 1);
+
+const prevDateStr = prevDate.getFullYear() === 2026
+  ? `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`
+  : null;
+const nextDateStr = nextDate.getFullYear() === 2026
+  ? `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`
+  : null;
 ---
 
 <Layout title={dateTitle} description={`Explore calendar conversions and cultural observances for the date ${dateTitle}.`}>
@@ -75,8 +85,37 @@ const dateObservances = matchedObservances.map(obs => {
 
   <main class="container main-content">
     <section class="date-header">
-      <h1 class="date-title">{dateTitle}</h1>
-      <p class="date-subtitle">Global conversions and observances occurring on this date</p>
+      <div class="date-header-top">
+        <div class="header-titles">
+          <h1 class="date-title">{dateTitle}</h1>
+          <p class="date-subtitle">Global conversions and observances occurring on this date</p>
+        </div>
+        <div class="date-nav-controls">
+          {prevDateStr ? (
+            <a href={`/date/${prevDateStr}`} class="date-nav-btn prev" title="Go to previous day">
+              <span class="material-symbols-outlined icon">arrow_back</span>
+              <span>Yesterday</span>
+            </a>
+          ) : (
+            <span class="date-nav-btn disabled">
+              <span class="material-symbols-outlined icon">arrow_back</span>
+              <span>Start</span>
+            </span>
+          )}
+
+          {nextDateStr ? (
+            <a href={`/date/${nextDateStr}`} class="date-nav-btn next" title="Go to next day">
+              <span>Tomorrow</span>
+              <span class="material-symbols-outlined icon">arrow_forward</span>
+            </a>
+          ) : (
+            <span class="date-nav-btn disabled">
+              <span>End</span>
+              <span class="material-symbols-outlined icon">arrow_forward</span>
+            </span>
+          )}
+        </div>
+      </div>
     </section>
 
     <!-- Content Grid -->
@@ -154,7 +193,49 @@ const dateObservances = matchedObservances.map(obs => {
 
   .date-header {
     border-bottom: 2px solid var(--color-primary);
-    padding-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-md);
+  }
+
+  .date-header-top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .date-nav-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .date-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    padding: 6px 14px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .date-nav-btn:hover:not(.disabled) {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+    border-color: var(--color-primary);
+  }
+
+  .date-nav-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .date-nav-btn .icon {
+    font-size: 1rem !important;
   }
 
   .date-title {
@@ -168,6 +249,14 @@ const dateObservances = matchedObservances.map(obs => {
     font-size: 1rem;
     color: var(--color-on-surface-variant);
     margin-top: var(--spacing-xs);
+  }
+
+  @media (min-width: 768px) {
+    .date-header-top {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
   }
 
   /* Grid details */

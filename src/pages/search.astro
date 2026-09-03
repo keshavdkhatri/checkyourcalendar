@@ -2,12 +2,72 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { CalendarRegistry } from '../engines/calendar/registry';
+import { ObservanceEngine } from '../engines/observance/engine';
 
-// Optional search parameter to show mock results
-const searchQuery = Astro.url.searchParams.get('q') || '';
+const allObservances = ObservanceEngine.getAllObservances();
+const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian');
+
+const calendarDescriptions: Record<string, string> = {
+  'hindu-vikram': 'Traditional lunisolar calendar used historically across Northern and Western India, including Gujarat (Vikram Samvat / Gujarati).',
+  'islamic-civil': 'Purely lunar calendar consisting of 12 lunar months used to determine Islamic observances and festivals (Hijri / Umm al-Qura).',
+  'hebrew': 'Traditional lunisolar calendar used for Jewish religious and national observances (Metonic cycle / Adar).',
+  'persian': 'Highly accurate astronomical solar calendar of Iran and Afghanistan (Solar Hijri / Nowruz / Jalali).',
+  'indian-saka': 'Official civil calendar of India introduced in 1957, based on solar astronomical calculations (Saka era).',
+  'chinese': 'Traditional lunisolar calendar of China and East Asia featuring the 60-year sexagenary cycle (农历 / Spring Festival / Year of the Horse).',
+  'coptic': 'Liturgical solar calendar of the Coptic Orthodox Church of Alexandria, inherited from ancient Egyptian timekeeping (Anno Martyrum / 13 months).',
+  'ethiopic': 'Principal civil calendar of Ethiopia and Eritrea, featuring 13 solar months and Ge\'ez tradition (Incarnation Era / Enkutatash).'
+};
+
+const calendarTags: Record<string, string[]> = {
+  'hindu-vikram': ['gujarati', 'hindu', 'vikram', 'samvat', 'panchang', 'tithi', 'india', 'kartak', 'shravan'],
+  'islamic-civil': ['islamic', 'hijri', 'muslim', 'lunar', 'ramadan', 'eid', 'mecca', 'umm al-qura'],
+  'hebrew': ['jewish', 'judaism', 'israel', 'hebrew', 'tishrei', 'nisan', 'yom kippur', 'rosh hashanah'],
+  'persian': ['iran', 'persian', 'solar hijri', 'nowruz', 'jalali', 'farvardin', 'afghanistan'],
+  'indian-saka': ['saka', 'national', 'civil', 'india', 'chaitra', 'gazette'],
+  'chinese': ['chinese', 'china', 'lunisolar', 'lunar', 'spring festival', 'horse', 'nongli', 'zhongqiu', 'duanwu'],
+  'coptic': ['coptic', 'egypt', 'alexandria', 'orthodox', 'martyrs', 'tout', 'kiahk', 'nasie'],
+  'ethiopic': ['ethiopian', 'ethiopia', 'eritrea', 'geez', 'meskerem', 'enkutatash', 'tahsas', 'pagume']
+};
+
+const searchIndex = [
+  ...allAdapters.map(adapter => ({
+    id: adapter.id,
+    type: 'calendar',
+    typeLabel: 'Calendar System',
+    title: adapter.name,
+    link: `/calendar/${adapter.id}`,
+    description: calendarDescriptions[adapter.id] || `${adapter.name} calendar system.`,
+    tags: [adapter.id, adapter.name.toLowerCase(), ...(calendarTags[adapter.id] || [])]
+  })),
+  ...allObservances.map(obs => {
+    const adapter = CalendarRegistry.getAdapter(obs.calendar);
+    return {
+      id: obs.id,
+      type: 'observance',
+      typeLabel: 'Observance',
+      title: obs.name,
+      link: `/observance/${obs.id}`,
+      description: obs.shortDescription,
+      badge: obs.type,
+      calendarName: adapter ? adapter.name : obs.calendar,
+      regionName: obs.regions.join(', ') || 'Global',
+      tags: [
+        obs.id,
+        obs.name.toLowerCase(),
+        obs.calendar.toLowerCase(),
+        ...(adapter ? [adapter.name.toLowerCase()] : []),
+        ...obs.tags.map(t => t.toLowerCase()),
+        ...obs.regions.map(r => r.toLowerCase()),
+        ...obs.traditions.map(t => t.toLowerCase()),
+        ...obs.communities.map(c => c.toLowerCase())
+      ]
+    };
+  })
+];
 ---
 
-<Layout title="Search" description="Search for specific calendar dates, religious festivals, fasting days, and historical stories.">
+<Layout title="Search" description="Search for calendar dates, religious festivals, fasting days, and global timekeeping systems.">
   <Header activeTab="search" />
 
   <main class="container main-content">
@@ -18,14 +78,14 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
 
     <!-- Search Form -->
     <section class="search-form-section">
-      <form action="/search" method="GET" class="search-form-bar">
+      <form action="/search" method="GET" class="search-form-bar" id="search-form">
         <span class="material-symbols-outlined input-icon">search</span>
         <input 
           type="search" 
+          id="search-input"
           name="q" 
-          placeholder="Search for 'Diwali', 'August 24', 'Hijri', etc..." 
+          placeholder="Search for 'Diwali', 'Chinese New Year', 'Coptic', '2026-09-04'..." 
           class="main-search-input" 
-          value={searchQuery}
           aria-label="Search site content"
           required
         />
@@ -33,53 +93,234 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
       </form>
     </section>
 
-    <!-- Search Results / Empty State -->
+    <!-- Search Results / Empty State Container -->
     <section class="results-section">
-      {searchQuery ? (
-        <div class="results-container">
-          <h2 class="results-heading">Results for "{searchQuery}"</h2>
-          
-          <div class="results-list">
-            <!-- Mock result item -->
-            <div class="result-card">
-              <span class="result-type">Calendar</span>
-              <h3 class="result-title">
-                <a href="/calendar/hindu-vikram">Vikram Samvat (Gujarati/Hindu)</a>
-              </h3>
-              <p class="result-excerpt">Lunisolar calendar used historically across Northern and Western India, including Gujarat.</p>
-            </div>
-            
-            <div class="result-card">
-              <span class="result-type">Observance</span>
-              <h3 class="result-title">
-                <a href="/observance/putrada-ekadashi">Shravan Putrada Ekadashi</a>
-              </h3>
-              <p class="result-excerpt">Fasting / Vrat observed on the 11th lunar day of the bright fortnight in the Vikram Samvat calendar.</p>
-            </div>
+      <!-- Active Results State -->
+      <div id="results-container" class="results-container" style="display: none;">
+        <h2 id="results-heading" class="results-heading">Results</h2>
+        <div id="results-list" class="results-list"></div>
+      </div>
+
+      <!-- No Results State -->
+      <div id="no-results-state" class="empty-state" style="display: none;">
+        <span class="material-symbols-outlined empty-icon">search_off</span>
+        <h2 class="empty-title">No results found</h2>
+        <p id="no-results-text" class="empty-description">
+          No matches were found. Try searching for a festival name, calendar tradition, or date.
+        </p>
+        <div class="suggestions-box">
+          <span class="suggestions-label">Try searching:</span>
+          <div class="suggestions-list">
+            <a href="/search?q=Janmashtami" class="suggestion-link">Janmashtami</a>
+            <a href="/search?q=Chinese+New+Year" class="suggestion-link">Chinese New Year</a>
+            <a href="/search?q=Coptic" class="suggestion-link">Coptic Calendar</a>
+            <a href="/search?q=Hijri" class="suggestion-link">Hijri</a>
+            <a href="/search?q=Diwali" class="suggestion-link">Diwali</a>
           </div>
         </div>
-      ) : (
-        <div class="empty-state">
-          <span class="material-symbols-outlined empty-icon">manage_search</span>
-          <h2 class="empty-title">Start exploring</h2>
-          <p class="empty-description">Enter a search term above to look up dates, religious festivals, fasting cycles, or cultural stories.</p>
-          
-          <!-- Suggested Search Topics -->
-          <div class="suggestions-box">
-            <span class="suggestions-label">Try searching:</span>
-            <div class="suggestions-list">
-              <a href="/search?q=Putrada+Ekadashi" class="suggestion-link">Putrada Ekadashi</a>
-              <a href="/search?q=Hijri" class="suggestion-link">Hijri Calendar</a>
-              <a href="/search?q=Yom+Kippur" class="suggestion-link">Yom Kippur</a>
-            </div>
+      </div>
+
+      <!-- Initial Empty State -->
+      <div id="empty-state" class="empty-state">
+        <span class="material-symbols-outlined empty-icon">manage_search</span>
+        <h2 class="empty-title">Start exploring</h2>
+        <p class="empty-description">Enter a search term above to look up dates, religious festivals, fasting cycles, or calendar traditions.</p>
+        
+        <!-- Suggested Search Topics -->
+        <div class="suggestions-box">
+          <span class="suggestions-label">Popular searches:</span>
+          <div class="suggestions-list">
+            <a href="/search?q=Chinese" class="suggestion-link">Chinese Calendar</a>
+            <a href="/search?q=Janmashtami" class="suggestion-link">Janmashtami</a>
+            <a href="/search?q=Coptic" class="suggestion-link">Coptic</a>
+            <a href="/search?q=Ethiopian" class="suggestion-link">Ethiopian</a>
+            <a href="/search?q=Hijri" class="suggestion-link">Hijri</a>
+            <a href="/search?q=Yom+Kippur" class="suggestion-link">Yom Kippur</a>
+            <a href="/search?q=2026-09-04" class="suggestion-link">Sept 4, 2026</a>
           </div>
         </div>
-      )}
+      </div>
     </section>
   </main>
 
+  <!-- Embed Search Index for Client-Side Filtering -->
+  <script id="search-data" type="application/json" set:html={JSON.stringify(searchIndex)} />
+
   <Footer />
 </Layout>
+
+<script>
+  interface SearchItem {
+    id: string;
+    type: string;
+    typeLabel: string;
+    title: string;
+    link: string;
+    description: string;
+    badge?: string;
+    calendarName?: string;
+    regionName?: string;
+    tags: string[];
+  }
+
+  function initSearch() {
+    const dataEl = document.getElementById('search-data');
+    const input = document.getElementById('search-input') as HTMLInputElement | null;
+    const form = document.getElementById('search-form');
+    const resultsContainer = document.getElementById('results-container');
+    const resultsHeading = document.getElementById('results-heading');
+    const resultsList = document.getElementById('results-list');
+    const emptyState = document.getElementById('empty-state');
+    const noResultsState = document.getElementById('no-results-state');
+    const noResultsText = document.getElementById('no-results-text');
+
+    if (!dataEl || !input || !resultsContainer || !resultsHeading || !resultsList || !emptyState || !noResultsState) {
+      return;
+    }
+
+    let searchIndex: SearchItem[] = [];
+    try {
+      searchIndex = JSON.parse(dataEl.textContent || '[]');
+    } catch (e) {
+      console.error('Failed to parse search index:', e);
+      return;
+    }
+
+    function performSearch(rawQuery: string) {
+      const q = rawQuery.trim();
+      input!.value = q;
+
+      if (!q) {
+        emptyState!.style.display = '';
+        resultsContainer!.style.display = 'none';
+        noResultsState!.style.display = 'none';
+        return;
+      }
+
+      emptyState!.style.display = 'none';
+
+      const qLower = q.toLowerCase();
+      const tokens = qLower.split(/\s+/).filter(Boolean);
+
+      // Check if query matches a date pattern (YYYY-MM-DD or Month Day)
+      const dateRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+      const dateMatch = q.match(dateRegex);
+      let dateResultCard = '';
+
+      if (dateMatch) {
+        const y = parseInt(dateMatch[1], 10);
+        const m = parseInt(dateMatch[2], 10);
+        const d = parseInt(dateMatch[3], 10);
+        if (y === 2026 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          const dateKey = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const jsDate = new Date(y, m - 1, d);
+          const formattedTitle = new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(jsDate);
+          
+          dateResultCard = `
+            <div class="result-card">
+              <span class="result-type">Date Lookup</span>
+              <h3 class="result-title">
+                <a href="/date/${dateKey}">${formattedTitle}</a>
+              </h3>
+              <p class="result-excerpt">Explore conversions across all 8 supported calendar systems and cultural observances for ${dateKey}.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Filter search index
+      const matched = searchIndex.filter(item => {
+        const itemText = (
+          item.title + ' ' +
+          item.description + ' ' +
+          (item.calendarName || '') + ' ' +
+          (item.regionName || '') + ' ' +
+          item.tags.join(' ')
+        ).toLowerCase();
+
+        return tokens.every(token => itemText.includes(token));
+      });
+
+      // Sort: exact matches first, then calendars, then observances
+      matched.sort((a, b) => {
+        const aExact = a.title.toLowerCase().includes(qLower) ? 1 : 0;
+        const bExact = b.title.toLowerCase().includes(qLower) ? 1 : 0;
+        if (aExact !== bExact) return bExact - aExact;
+        if (a.type === 'calendar' && b.type !== 'calendar') return -1;
+        if (b.type === 'calendar' && a.type !== 'calendar') return 1;
+        return a.title.localeCompare(b.title);
+      });
+
+      const totalResults = matched.length + (dateResultCard ? 1 : 0);
+
+      if (totalResults === 0) {
+        resultsContainer!.style.display = 'none';
+        noResultsState!.style.display = '';
+        if (noResultsText) {
+          noResultsText.textContent = `No matches found for "${q}". Try searching for a festival name, calendar system, or date.`;
+        }
+      } else {
+        noResultsState!.style.display = 'none';
+        resultsContainer!.style.display = '';
+        resultsHeading!.textContent = `Found ${totalResults} result${totalResults === 1 ? '' : 's'} for "${q}"`;
+
+        let html = dateResultCard;
+        for (const item of matched) {
+          const metaInfo = item.calendarName ? `<span class="result-meta-item">${item.calendarName}</span>` : '';
+          const regionInfo = item.regionName ? `<span class="result-meta-item">${item.regionName}</span>` : '';
+
+          html += `
+            <div class="result-card">
+              <div class="result-header">
+                <span class="result-type">${item.typeLabel}</span>
+              </div>
+              <h3 class="result-title">
+                <a href="${item.link}">${item.title}</a>
+              </h3>
+              <p class="result-excerpt">${item.description}</p>
+              ${metaInfo || regionInfo ? `<div class="result-meta">${metaInfo}${regionInfo}</div>` : ''}
+            </div>
+          `;
+        }
+        resultsList!.innerHTML = html;
+      }
+    }
+
+    // Read query from URL on load
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('q') || '';
+    if (initialQuery) {
+      performSearch(initialQuery);
+    } else {
+      emptyState!.style.display = '';
+      resultsContainer!.style.display = 'none';
+      noResultsState!.style.display = 'none';
+    }
+
+    // Handle form submission
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const query = input.value.trim();
+        const newUrl = query ? `/search?q=${encodeURIComponent(query)}` : '/search';
+        window.history.pushState(null, '', newUrl);
+        performSearch(query);
+      });
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+      const p = new URLSearchParams(window.location.search);
+      performSearch(p.get('q') || '');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearch);
+  } else {
+    initSearch();
+  }
+</script>
 
 <style>
   .main-content {
@@ -148,6 +389,7 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
     padding: var(--spacing-sm) var(--spacing-lg);
     font-weight: 600;
     cursor: pointer;
+    transition: background-color 0.2s ease;
   }
 
   .submit-btn:hover {
@@ -178,10 +420,22 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
     background-color: var(--color-surface);
     border: 1px solid var(--color-outline);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .result-card:hover {
+    background-color: var(--color-surface-container-low);
+    border-color: var(--color-outline-variant);
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .result-type {
@@ -194,16 +448,38 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
 
   .result-title {
     font-family: var(--font-serif);
-    font-size: 1.125rem;
+    font-size: 1.2rem;
     color: var(--color-primary);
+  }
+
+  .result-title a {
+    color: var(--color-primary);
+    text-decoration: none;
   }
 
   .result-title a:hover {
     text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .result-excerpt {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .result-meta-item {
+    font-size: 0.75rem;
+    background-color: var(--color-surface-dim);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
     color: var(--color-on-surface-variant);
   }
 
@@ -267,6 +543,7 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
     padding: 4px 12px;
     font-size: 0.8125rem;
     color: var(--color-primary);
+    text-decoration: none;
   }
 
   .suggestion-link:hover {
@@ -275,3 +552,4 @@ const searchQuery = Astro.url.searchParams.get('q') || '';
     border-color: var(--color-primary);
   }
 </style>
+

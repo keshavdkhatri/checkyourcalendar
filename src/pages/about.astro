@@ -68,10 +68,41 @@ import Footer from '../components/Footer.astro';
           We hold cultural and religious content to high accuracy standards:
         </p>
         <ul>
-          <li><strong>No Mass AI Filler:</strong> All descriptions and stories are curated and fact-checked. We do not mass-generate spiritual claims or historical legends.</li>
-          <li><strong>Attribution:</strong> We reference academic publications, government registries, and established cultural/religious archives.</li>
+          <li><strong>No Mass AI Filler:</strong> All descriptions and historical contexts are curated and fact-checked. We do not mass-generate spiritual claims or legends.</li>
+          <li><strong>Attribution:</strong> We reference academic publications, astronomical ephemerides, government gazettes, and established cultural/religious archives.</li>
           <li><strong>Neutral Tone:</strong> We present cultural and religious traditions informatively and respectfully, without promotion or sectarian bias.</li>
         </ul>
+
+        <h2 id="faq">Frequently Asked Questions</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3>Which calendars are supported in V1?</h3>
+            <p>
+              CheckYourCalendar currently provides full mathematical and cultural conversion for 8 major systems: <strong>Vikram Samvat (Gujarati/Hindu)</strong>, <strong>Hijri (Islamic Civil / Umm al-Qura)</strong>, <strong>Hebrew</strong>, <strong>Persian (Solar Hijri)</strong>, <strong>Indian National (Saka)</strong>, <strong>Chinese Traditional (Lunisolar)</strong>, <strong>Coptic (Alexandrian)</strong>, and <strong>Ethiopian (Ge'ez)</strong>.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why might a traditional date vary by one day regionally?</h3>
+            <p>
+              Certain lunar and lunisolar traditions (such as Islamic Hijri and Hindu Panchang) historically rely on local astronomical conditions—such as physical crescent moon sightings or sunrise tithi timings in specific timezones. We use standardized civil and astronomical algorithms as a baseline, while noting regional variance factors on relevant observance pages.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>What is the difference between a calendar system and an observance?</h3>
+            <p>
+              A <strong>calendar system</strong> is a mathematical and astronomical framework for dividing time (years, months, cycles). An <strong>observance</strong> is a specific cultural festival, religious holy day, fast, or commemoration that occurs on designated coordinates within that system.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How do I report a discrepancy or suggest an observance?</h3>
+            <p>
+              If you notice a calendar calculation variance or wish to suggest an observance for addition, please reach out via our <a href="/contact">Contact Page</a>. We review every submission against primary astronomical and cultural sources.
+            </p>
+          </div>
+        </div>
       </section>
     </article>
   </main>
@@ -147,6 +178,42 @@ import Footer from '../components/Footer.astro';
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
+  }
+
+  /* FAQ Section Styling */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+  }
+
+  .faq-item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .faq-item h3 {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    color: var(--color-primary);
+  }
+
+  .faq-item p {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .faq-item a {
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: underline;
   }
 
   /* Mission Path Bento style timeline */

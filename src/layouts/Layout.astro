@@ -52,6 +52,20 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     
     <!-- Material Icons for UI icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "CheckYourCalendar",
+      "url": "https://checkyourcalendar.com",
+      "description": "Check your calendar — and understand what today means across calendars, cultures, and traditions.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://checkyourcalendar.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    })} />
   </head>
   <body>
     <slot />
