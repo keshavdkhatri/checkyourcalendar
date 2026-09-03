@@ -125,24 +125,8 @@ const observances = matchedObservances.map(obs => {
         <aside class="spotlight-card">
           <h3 class="spotlight-title">Why Today Matters</h3>
           <p class="spotlight-text">
-            Today marks a unique intersection in celestial timekeeping. The 11th tithi (Ekadashi) in the lunar cycle coincides with the late summer monsoon transition in South Asia, a period historically associated with purification and renewal. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles and spiritual milestones.
+            Today marks a unique intersection in celestial timekeeping. The alignment of these multiple calendar systems today highlights the shared human endeavor to track solar transitions, lunar cycles, and cultural milestones across traditions.
           </p>
-        </aside>
-
-        <!-- Featured Story teaser card -->
-        <aside class="story-teaser-card">
-          <div class="image-placeholder" aria-hidden="true">
-            <span class="material-symbols-outlined placeholder-icon">auto_stories</span>
-          </div>
-          <div class="teaser-content">
-            <span class="teaser-label">Featured Story</span>
-            <h3 class="teaser-title">The Legend of Putrada Ekadashi</h3>
-            <p class="teaser-excerpt">The ancient narrative of King Mahajit and the seekers of blessing on the eleventh lunar day of Shravana.</p>
-            <a href="/story/putrada-ekadashi" class="teaser-link">
-              Read the Story Behind the Day
-              <span class="material-symbols-outlined link-icon">arrow_forward</span>
-            </a>
-          </div>
         </aside>
       </div>
     </section>
@@ -208,52 +192,13 @@ const observances = matchedObservances.map(obs => {
       
       // 3. Update the Spotlight section dynamically
       const spotlightText = document.querySelector('.spotlight-text');
-      const storyTeaserCard = document.querySelector('.story-teaser-card') as HTMLElement | null;
-      
-      if (todayStr === '2026-08-24') {
-        // Restore/keep original August 24 content if today is indeed August 24
-        if (spotlightText) {
+      if (spotlightText) {
+        if (todayStr === '2026-08-24') {
           spotlightText.textContent = `Today marks a unique intersection in celestial timekeeping. The 11th tithi (Ekadashi) in the lunar cycle coincides with the late summer monsoon transition in South Asia, a period historically associated with purification and renewal. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles and spiritual milestones.`;
-        }
-        if (storyTeaserCard) {
-          storyTeaserCard.style.display = '';
-          const teaserTitle = storyTeaserCard.querySelector('.teaser-title');
-          const teaserExcerpt = storyTeaserCard.querySelector('.teaser-excerpt');
-          const teaserLink = storyTeaserCard.querySelector('.teaser-link') as HTMLAnchorElement | null;
-          if (teaserTitle) teaserTitle.textContent = 'The Legend of Putrada Ekadashi';
-          if (teaserExcerpt) teaserExcerpt.textContent = 'The ancient narrative of King Mahajit and the seekers of blessing on the eleventh lunar day of Shravana.';
-          if (teaserLink) teaserLink.href = '/story/putrada-ekadashi';
-        }
-      } else {
-        // Show generic spotlight text for other dates
-        if (spotlightText) {
-          spotlightText.textContent = `Today marks a unique intersection in celestial timekeeping. The alignment of these multiple calendar systems today highlights the shared human endeavor to track agricultural cycles, astronomical alignments, and spiritual milestones across cultures.`;
-        }
-        
-        // Find if there is a story link in the new observances
-        const storyLink = newObservancesList?.querySelector('.story-link') as HTMLAnchorElement | null;
-        if (storyLink && storyTeaserCard) {
-          storyTeaserCard.style.display = '';
-          const href = storyLink.getAttribute('href') || '';
-          
-          // Get details from the card
-          const card = storyLink.closest('.observance-card');
-          const cardTitle = card?.querySelector('.observance-title')?.textContent?.trim() || '';
-          const cardSummary = card?.querySelector('.summary')?.textContent?.trim() || '';
-          
-          const teaserTitle = storyTeaserCard.querySelector('.teaser-title');
-          const teaserExcerpt = storyTeaserCard.querySelector('.teaser-excerpt');
-          const teaserLink = storyTeaserCard.querySelector('.teaser-link') as HTMLAnchorElement | null;
-          
-          if (teaserTitle) teaserTitle.textContent = cardTitle;
-          if (teaserExcerpt) teaserExcerpt.textContent = cardSummary;
-          if (teaserLink) teaserLink.href = href;
-        } else if (storyTeaserCard) {
-          // Hide teaser card if no stories for today
-          storyTeaserCard.style.display = 'none';
+        } else {
+          spotlightText.textContent = `Today marks a unique intersection in celestial timekeeping. The alignment of these multiple calendar systems today highlights the shared human endeavor to track solar transitions, lunar cycles, and cultural milestones across traditions.`;
         }
       }
-      
     } catch (err) {
       console.error('Error fetching today\'s date data:', err);
     }

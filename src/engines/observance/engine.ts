@@ -1,12 +1,22 @@
 import type { GregorianDate } from '../calendar/types';
 import { CalendarRegistry } from '../calendar/registry';
-import { type Observance } from './types';
+import { type Observance, type ObservanceQueryOptions } from './types';
 import { observanceRules } from './rules';
 import { getDailyPanchang } from 'panchang-ts';
 import { AHMEDABAD_COORDS, DEFAULT_TIMEZONE } from '../calendar/PanchangHelper';
 
 export class ObservanceEngine {
-  static getObservancesForDate(date: GregorianDate): Observance[] {
+  static getObservancesForDate(
+    date: GregorianDate,
+    optionsOrCalendarId?: string | ObservanceQueryOptions
+  ): Observance[] {
+    const calendarFilter = typeof optionsOrCalendarId === 'string'
+      ? optionsOrCalendarId
+      : optionsOrCalendarId?.calendar;
+    const typeFilter = typeof optionsOrCalendarId === 'object'
+      ? optionsOrCalendarId?.type
+      : undefined;
+
     const conversions = CalendarRegistry.convert(date);
     const matched: Observance[] = [];
 
@@ -100,7 +110,20 @@ export class ObservanceEngine {
       }
     }
 
-    return matched;
+    let results = matched;
+
+    if (calendarFilter) {
+      results = results.filter(rule => 
+        rule.calendar === calendarFilter || 
+        (rule.calendars && rule.calendars.includes(calendarFilter))
+      );
+    }
+
+    if (typeFilter) {
+      results = results.filter(rule => rule.type === typeFilter);
+    }
+
+    return results;
   }
 
   static getObservanceById(id: string): Observance | undefined {

@@ -4,53 +4,306 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { mockStories } from '../data/mockData';
 
-const storiesList = Object.values(mockStories);
+// Chronologically sort stories by their associated date
+const storiesList = Object.values(mockStories).sort((a, b) => {
+  const dateA = a.eventDate || a.publishDate;
+  const dateB = b.eventDate || b.publishDate;
+  return new Date(dateA).getTime() - new Date(dateB).getTime();
+});
+
+const months = [
+  { num: 1, name: 'January', short: 'Jan' },
+  { num: 2, name: 'February', short: 'Feb' },
+  { num: 3, name: 'March', short: 'Mar' },
+  { num: 4, name: 'April', short: 'Apr' },
+  { num: 5, name: 'May', short: 'May' },
+  { num: 6, name: 'June', short: 'Jun' },
+  { num: 7, name: 'July', short: 'Jul' },
+  { num: 8, name: 'August', short: 'Aug' },
+  { num: 9, name: 'September', short: 'Sep' },
+  { num: 10, name: 'October', short: 'Oct' },
+  { num: 11, name: 'November', short: 'Nov' },
+  { num: 12, name: 'December', short: 'Dec' },
+];
+
+// Extract unique traditions and story types from active data for scalable UI
+const traditions = [
+  { id: 'all', label: 'All Traditions' },
+  { id: 'vedic', label: 'Vedic / Hindu' },
+  { id: 'global', label: 'Global / International' }
+];
+
+const storyTypes = [
+  { id: 'all', label: 'All Types' },
+  { id: 'festival', label: 'Festivals' },
+  { id: 'fast', label: 'Fasting / Spiritual' },
+  { id: 'commemoration', label: 'Memorials & Days' }
+];
 ---
 
-<Layout title="Stories - Feed" description="Read the Story Behind the Day and explore the history, legends, and significance of cultural holidays.">
+<Layout title="Stories Behind the Day - CheckYourCalendar" description="Discover the sacred history, origin narratives, and cultural meaning behind observances throughout the year.">
   <Header activeTab="stories" />
 
   <main class="container main-content">
+    <!-- Header Section -->
     <section class="explorer-header">
       <h1 class="page-title">Stories Behind the Day</h1>
       <p class="page-intro">
-        Delve deeper into cultural traditions. Every calendar date is more than a number — it carries history, storytelling, and human connection.
+        Delve deeper into cultural and historical traditions. Every calendar date carries memory, storytelling, and sacred meaning across civilizations.
       </p>
     </section>
 
-    <!-- Editorial Feed Grid -->
-    <section class="stories-feed-grid">
-      {storiesList.map((story, index) => {
-        // Make the first story featured/larger if desired, or keep them balanced.
-        const isFeatured = index === 0;
-        return (
-          <article class={`story-row-card ${isFeatured ? 'featured' : ''}`}>
-            <div class="thumbnail-area">
-              <span class="material-symbols-outlined icon">auto_stories</span>
+    <!-- Interactive Filter Controls -->
+    <section class="discovery-filters-container" aria-label="Story filters">
+      <!-- Month Filter Bar -->
+      <div class="filter-group">
+        <span class="filter-label">Filter by Month:</span>
+        <div class="month-filter-track" role="tablist" aria-label="Filter stories by month">
+          <button class="month-pill active" data-month-filter="all" role="tab" aria-selected="true">
+            All Months
+          </button>
+          {months.map(m => (
+            <button class="month-pill" data-month-filter={m.num} role="tab" aria-selected="false" title={m.name}>
+              {m.short}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tradition & Type Filter Row -->
+      <div class="filter-row">
+        <div class="filter-group">
+          <span class="filter-label">Tradition:</span>
+          <div class="filter-chips" role="tablist" aria-label="Filter stories by tradition">
+            {traditions.map((t, idx) => (
+              <button 
+                class={`chip-btn ${idx === 0 ? 'active' : ''}`} 
+                data-tradition-filter={t.id}
+                role="tab"
+                aria-selected={idx === 0 ? 'true' : 'false'}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Story Type:</span>
+          <div class="filter-chips" role="tablist" aria-label="Filter stories by type">
+            {storyTypes.map((st, idx) => (
+              <button 
+                class={`chip-btn ${idx === 0 ? 'active' : ''}`} 
+                data-type-filter={st.id}
+                role="tab"
+                aria-selected={idx === 0 ? 'true' : 'false'}
+              >
+                {st.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Indicator & Reset Action -->
+      <div class="filter-status-bar">
+        <span id="results-count" class="results-text">Showing {storiesList.length} stories</span>
+        <button id="reset-filters-btn" class="reset-btn" hidden>
+          <span class="material-symbols-outlined icon">restart_alt</span>
+          Reset Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- Chronological Stories Feed -->
+    <section class="stories-feed-grid" id="stories-feed">
+      {storiesList.map((story) => (
+        <article 
+          class="story-row-card" 
+          data-month={story.month} 
+          data-tradition={story.tradition} 
+          data-type={story.storyType}
+        >
+          <div class="thumbnail-area">
+            <span class="material-symbols-outlined icon">auto_stories</span>
+          </div>
+          
+          <div class="content-area">
+            <div class="badge-row">
+              <span class="category-label">{story.category}</span>
+              <span class="type-pill">{story.storyTypeLabel}</span>
             </div>
             
-            <div class="content-area">
-              <span class="category-label">{story.category}</span>
-              <h2 class="story-heading">
-                <a href={`/story/${story.slug}`}>{story.title}</a>
-              </h2>
-              <p class="excerpt">{story.excerpt}</p>
-              <div class="footer-meta">
-                <span class="publish-date">{story.publishDate}</span>
-                <a href={`/story/${story.slug}`} class="read-link">
-                  <span class="read-link-text">Read Article</span>
-                  <span class="material-symbols-outlined link-icon">arrow_forward</span>
-                </a>
+            <h2 class="story-heading">
+              <a href={`/story/${story.slug}`} class="stretched-link">{story.title}</a>
+            </h2>
+            
+            {story.subtitle && <p class="story-subtitle">{story.subtitle}</p>}
+            
+            <p class="excerpt">{story.excerpt}</p>
+            
+            <div class="footer-meta">
+              <span class="publish-date">
+                <span class="material-symbols-outlined cal-icon">calendar_today</span>
+                {story.publishDate}
+              </span>
+              
+              <div class="read-action">
+                <span class="read-link-text">Read Story</span>
+                <span class="material-symbols-outlined link-icon">arrow_forward</span>
               </div>
             </div>
-          </article>
-        );
-      })}
+          </div>
+        </article>
+      ))}
+
+      <!-- Empty State (when filters yield no stories) -->
+      <div id="empty-state" class="empty-state-card" hidden>
+        <span class="material-symbols-outlined empty-icon">menu_book</span>
+        <h3 class="empty-title">No Stories Found</h3>
+        <p class="empty-desc">
+          There are currently no published stories matching your selected month and filter criteria.
+        </p>
+        <button id="empty-reset-btn" class="empty-action-btn">
+          Show All Stories
+        </button>
+      </div>
     </section>
   </main>
 
   <Footer />
 </Layout>
+
+<script>
+  let selectedMonth = 'all';
+  let selectedTradition = 'all';
+  let selectedType = 'all';
+
+  const monthButtons = document.querySelectorAll<HTMLButtonElement>('[data-month-filter]');
+  const traditionButtons = document.querySelectorAll<HTMLButtonElement>('[data-tradition-filter]');
+  const typeButtons = document.querySelectorAll<HTMLButtonElement>('[data-type-filter]');
+  const storyCards = document.querySelectorAll<HTMLElement>('.story-row-card');
+  const resultsCount = document.getElementById('results-count');
+  const resetBtn = document.getElementById('reset-filters-btn');
+  const emptyState = document.getElementById('empty-state');
+  const emptyResetBtn = document.getElementById('empty-reset-btn');
+
+  function updateFilters() {
+    let visibleCount = 0;
+
+    storyCards.forEach(card => {
+      const cardMonth = card.dataset.month || '';
+      const cardTradition = card.dataset.tradition || '';
+      const cardType = card.dataset.type || '';
+
+      const matchMonth = (selectedMonth === 'all' || cardMonth === selectedMonth);
+      const matchTradition = (selectedTradition === 'all' || cardTradition === selectedTradition);
+      const matchType = (selectedType === 'all' || cardType === selectedType);
+
+      if (matchMonth && matchTradition && matchType) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update count indicator
+    if (resultsCount) {
+      resultsCount.textContent = `Showing ${visibleCount} ${visibleCount === 1 ? 'story' : 'stories'}`;
+    }
+
+    // Toggle Empty State
+    if (emptyState) {
+      if (visibleCount === 0) {
+        emptyState.removeAttribute('hidden');
+      } else {
+        emptyState.setAttribute('hidden', '');
+      }
+    }
+
+    // Toggle Reset Button
+    const isFiltered = (selectedMonth !== 'all' || selectedTradition !== 'all' || selectedType !== 'all');
+    if (resetBtn) {
+      if (isFiltered) {
+        resetBtn.removeAttribute('hidden');
+      } else {
+        resetBtn.setAttribute('hidden', '');
+      }
+    }
+  }
+
+  function resetAll() {
+    selectedMonth = 'all';
+    selectedTradition = 'all';
+    selectedType = 'all';
+
+    monthButtons.forEach(btn => {
+      const isAll = btn.dataset.monthFilter === 'all';
+      btn.classList.toggle('active', isAll);
+      btn.setAttribute('aria-selected', isAll ? 'true' : 'false');
+    });
+
+    traditionButtons.forEach(btn => {
+      const isAll = btn.dataset.traditionFilter === 'all';
+      btn.classList.toggle('active', isAll);
+      btn.setAttribute('aria-selected', isAll ? 'true' : 'false');
+    });
+
+    typeButtons.forEach(btn => {
+      const isAll = btn.dataset.typeFilter === 'all';
+      btn.classList.toggle('active', isAll);
+      btn.setAttribute('aria-selected', isAll ? 'true' : 'false');
+    });
+
+    updateFilters();
+  }
+
+  // Month clicks
+  monthButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      monthButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      selectedMonth = btn.dataset.monthFilter || 'all';
+      updateFilters();
+    });
+  });
+
+  // Tradition clicks
+  traditionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      traditionButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      selectedTradition = btn.dataset.traditionFilter || 'all';
+      updateFilters();
+    });
+  });
+
+  // Type clicks
+  typeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      typeButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      selectedType = btn.dataset.typeFilter || 'all';
+      updateFilters();
+    });
+  });
+
+  resetBtn?.addEventListener('click', resetAll);
+  emptyResetBtn?.addEventListener('click', resetAll);
+</script>
 
 <style>
   .main-content {
@@ -78,7 +331,150 @@ const storiesList = Object.values(mockStories);
     line-height: 1.6;
   }
 
-  /* Story layout cards */
+  /* Filter Controls Container */
+  .discovery-filters-container {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface-variant);
+  }
+
+  /* Month Filter Scroll Track */
+  .month-filter-track {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .month-pill {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-outline);
+    background-color: var(--color-surface-dim);
+    color: var(--color-on-surface);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .month-pill:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface);
+  }
+
+  .month-pill.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* Tradition and Type Row */
+  .filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    border-top: 1px dashed var(--color-outline-variant);
+    padding-top: var(--spacing-md);
+  }
+
+  @media (min-width: 768px) {
+    .filter-row {
+      flex-direction: row;
+      gap: var(--spacing-xl);
+    }
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip-btn {
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-outline);
+    background-color: var(--color-surface-dim);
+    color: var(--color-on-surface);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .chip-btn:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface);
+  }
+
+  .chip-btn.active {
+    background-color: var(--color-secondary);
+    color: var(--color-on-secondary);
+    border-color: var(--color-secondary);
+    font-weight: 600;
+  }
+
+  /* Status Bar */
+  .filter-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-outline-variant);
+    padding-top: var(--spacing-xs);
+  }
+
+  .results-text {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    font-weight: 500;
+  }
+
+  .reset-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+  }
+
+  .reset-btn:hover {
+    text-decoration: underline;
+    background-color: var(--color-surface-dim);
+  }
+
+  .reset-btn .icon {
+    font-size: 0.875rem !important;
+  }
+
+  /* Story Cards Feed */
   .stories-feed-grid {
     display: flex;
     flex-direction: column;
@@ -86,31 +482,35 @@ const storiesList = Object.values(mockStories);
   }
 
   .story-row-card {
+    position: relative;
     background-color: var(--color-surface);
     border: 1px solid var(--color-outline);
     border-radius: var(--radius-md);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
 
   .story-row-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 74, 63, 0.08);
+    box-shadow: 0 6px 18px rgba(139, 74, 63, 0.09);
+    border-color: var(--color-primary);
   }
 
   .thumbnail-area {
-    height: 160px;
+    height: 140px;
     background-color: var(--color-surface-dim);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid var(--color-outline);
+    border-bottom: 1px solid var(--color-outline-variant);
+    flex-shrink: 0;
   }
 
   .thumbnail-area .icon {
-    font-size: 3rem !important;
+    font-size: 2.75rem !important;
     color: var(--color-outline-variant);
   }
 
@@ -122,12 +522,29 @@ const storiesList = Object.values(mockStories);
     flex-grow: 1;
   }
 
+  .badge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+  }
+
   .category-label {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--color-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .type-pill {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    background-color: var(--color-surface-dim);
+    color: var(--color-on-surface-variant);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .story-heading {
@@ -135,11 +552,37 @@ const storiesList = Object.values(mockStories);
     font-size: 1.35rem;
     font-weight: 600;
     color: var(--color-on-surface);
+    line-height: 1.3;
+    margin-top: 2px;
   }
 
-  .story-heading a:hover {
+  /* Stretched link pattern for card-wide clickability without nested links */
+  .stretched-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .stretched-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  .story-row-card:hover .story-heading .stretched-link {
     color: var(--color-primary);
     text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .story-subtitle {
+    font-size: 0.875rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 2px;
   }
 
   .excerpt {
@@ -159,52 +602,108 @@ const storiesList = Object.values(mockStories);
   }
 
   .publish-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.8125rem;
     color: var(--color-on-surface-variant);
   }
 
-  .read-link {
+  .cal-icon {
+    font-size: 0.875rem !important;
+    color: var(--color-tertiary);
+  }
+
+  .read-action {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--color-primary);
-    text-decoration: none;
   }
 
   .read-link-text {
     text-decoration: none;
   }
 
-  .read-link:hover .read-link-text {
+  .story-row-card:hover .read-action .read-link-text {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
 
-  .read-link .link-icon {
+  .link-icon {
     font-size: 0.875rem !important;
     text-decoration: none !important;
     display: inline-block;
     transition: transform 0.2s ease;
   }
 
-  .read-link:hover .link-icon {
+  .story-row-card:hover .read-action .link-icon {
     transform: translateX(3px);
   }
 
   @media (min-width: 768px) {
     .story-row-card {
       flex-direction: row;
-      height: 220px;
+      min-height: 200px;
     }
 
     .thumbnail-area {
-      width: 260px;
+      width: 220px;
       height: 100%;
       border-bottom: none;
-      border-right: 1px solid var(--color-outline);
-      flex-shrink: 0;
+      border-right: 1px solid var(--color-outline-variant);
     }
   }
+
+  /* Empty State Card */
+  .empty-state-card {
+    background-color: var(--color-surface);
+    border: 1px dashed var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .empty-icon {
+    font-size: 3rem !important;
+    color: var(--color-outline-variant);
+  }
+
+  .empty-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--color-on-surface);
+  }
+
+  .empty-desc {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  .empty-action-btn {
+    margin-top: var(--spacing-xs);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .empty-action-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
 </style>
+

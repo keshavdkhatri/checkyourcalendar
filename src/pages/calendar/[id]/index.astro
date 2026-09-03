@@ -39,7 +39,7 @@ for (let d = 1; d <= daysInMonth; d++) {
   const dayOfWeek = jsDate.getDay();
   const converted = adapter.fromGregorian(dateObj);
   const formatted = adapter.format(converted);
-  const observances = ObservanceEngine.getObservancesForDate(dateObj);
+  const observances = ObservanceEngine.getObservancesForDate(dateObj, adapter.id);
   const dateKey = `${year}-${String(monthNum).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
   days.push({

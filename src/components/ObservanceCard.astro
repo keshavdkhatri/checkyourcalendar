@@ -56,15 +56,6 @@ const hasValidStory = Boolean(storyRef && mockStories[storyRef]);
       {regionName}
     </span>
   </div>
-  
-  {hasValidStory && (
-    <div class="action-row">
-      <a href={`/story/${storyRef}`} class="story-link">
-        <span class="story-link-text">Read the Story Behind the Day</span>
-        <span class="material-symbols-outlined story-link-icon">arrow_forward</span>
-      </a>
-    </div>
-  )}
 </article>
 
 <style>

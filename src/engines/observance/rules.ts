@@ -1286,6 +1286,298 @@ export const observanceRules: Observance[] = [
     relatedObservances: ['republic-day-india', 'independence-day-india'],
     shortDescription: 'National holiday in India and UN International Day of Non-Violence honoring the birthday and philosophy of Mahatma Gandhi.',
     tags: ['gandhi', 'non-violence', 'national-holiday', 'holiday']
+  },
+
+  // --- Chinese Traditional Lunisolar Observances ---
+  {
+    id: 'chinese-new-year',
+    name: 'Chinese New Year (Spring Festival / 春节)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'chinese',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'chinese',
+      calendarMonth: 1, // Month 1 (Zhengyue)
+      calendarDay: 1
+    },
+    regions: ['China', 'East Asia', 'Global'],
+    traditions: ['Chinese Traditional', 'East Asian'],
+    communities: ['Chinese Diaspora'],
+    isPublicHoliday: true,
+    countries: ['CN', 'TW', 'HK', 'SG', 'MY'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Standard Astronomical Calendar of China (GB/T 33661-2017)',
+        type: 'government'
+      }
+    ],
+    shortDescription: 'The most important traditional Chinese festival, marking the beginning of the lunar year (Year of the Horse in 2026) with family reunions, feasts, and dragon dances.',
+    tags: ['spring-festival', 'chinese-new-year', 'lunar-new-year', 'festival']
+  },
+  {
+    id: 'lantern-festival',
+    name: 'Lantern Festival (Yuanxiao / 元宵节)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'chinese',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'chinese',
+      calendarMonth: 1,
+      calendarDay: 15
+    },
+    regions: ['China', 'East Asia', 'Global'],
+    traditions: ['Chinese Traditional'],
+    communities: ['Chinese Diaspora'],
+    isPublicHoliday: false,
+    countries: ['CN', 'TW', 'HK'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Purple Mountain Observatory Lunar Calendar Documentation',
+        type: 'astronomical'
+      }
+    ],
+    shortDescription: 'Celebrated on the 15th day of the first lunar month, marking the final day of the traditional Chinese New Year celebrations with lantern displays and sweet rice balls (tangyuan).',
+    tags: ['lantern-festival', 'yuanxiao', 'festival']
+  },
+  {
+    id: 'dragon-boat-festival',
+    name: 'Dragon Boat Festival (Duanwu / 端午节)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'chinese',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'chinese',
+      calendarMonth: 5,
+      calendarDay: 5
+    },
+    regions: ['China', 'East Asia', 'Global'],
+    traditions: ['Chinese Traditional'],
+    communities: ['Chinese Diaspora'],
+    isPublicHoliday: true,
+    countries: ['CN', 'TW', 'HK'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Ministry of Culture and Tourism of China',
+        type: 'government'
+      }
+    ],
+    shortDescription: 'Occurring on the 5th day of the 5th lunar month, commemorating the ancient poet Qu Yuan with dragon boat races and sticky rice dumplings (zongzi).',
+    tags: ['duanwu', 'dragon-boat', 'festival']
+  },
+  {
+    id: 'mid-autumn-festival',
+    name: 'Mid-Autumn Festival (Zhongqiu / 中秋节)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'chinese',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'chinese',
+      calendarMonth: 8,
+      calendarDay: 15
+    },
+    regions: ['China', 'East Asia', 'Global'],
+    traditions: ['Chinese Traditional'],
+    communities: ['Chinese Diaspora'],
+    isPublicHoliday: true,
+    countries: ['CN', 'TW', 'HK', 'SG', 'MY'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Standard Astronomical Calendar of China (GB/T 33661-2017)',
+        type: 'government'
+      }
+    ],
+    shortDescription: 'A joyful harvest festival celebrated on the 15th day of the 8th lunar month under the full harvest moon with mooncakes, lanterns, and family gatherings.',
+    tags: ['mid-autumn', 'moon-festival', 'zhongqiu', 'festival']
+  },
+  {
+    id: 'double-ninth-festival',
+    name: 'Double Ninth Festival (Chongyang / 重阳节)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'chinese',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'chinese',
+      calendarMonth: 9,
+      calendarDay: 9
+    },
+    regions: ['China', 'East Asia', 'Global'],
+    traditions: ['Chinese Traditional'],
+    communities: ['Chinese Diaspora'],
+    isPublicHoliday: false,
+    countries: ['CN', 'TW', 'HK'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Chinese Folk Literature and Art Association',
+        type: 'encyclopedia'
+      }
+    ],
+    shortDescription: 'Observed on the 9th day of the 9th lunar month as a day of respect for the elderly, hiking up mountains, and enjoying chrysanthemum tea and cakes.',
+    tags: ['chongyang', 'double-ninth', 'seniors-day', 'festival']
+  },
+
+  // --- Coptic Calendar Observances ---
+  {
+    id: 'coptic-new-year',
+    name: 'Nayrouz (Coptic New Year / Feast of the Martyrs)',
+    type: ObservanceType.HOLY_DAY,
+    calendar: 'coptic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'coptic',
+      calendarMonth: 1, // 1 Tout
+      calendarDay: 1
+    },
+    regions: ['Egypt', 'Global'],
+    traditions: ['Coptic Orthodox'],
+    communities: ['Coptic Christians'],
+    isPublicHoliday: false,
+    countries: ['EG'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Coptic Orthodox Patriarchate Liturgical Synaxarium',
+        type: 'religious-authority'
+      }
+    ],
+    shortDescription: 'The Coptic New Year (1 Tout), commemorating the Christian martyrs of Egypt during the Roman persecutions under Emperor Diocletian.',
+    tags: ['coptic', 'nayrouz', 'coptic-new-year', 'martyrs', 'holy-day']
+  },
+  {
+    id: 'coptic-christmas',
+    name: 'Coptic Christmas (Feast of the Nativity / 29 Kiahk)',
+    type: ObservanceType.HOLY_DAY,
+    calendar: 'coptic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'coptic',
+      calendarMonth: 4, // 29 Kiahk (Jan 7)
+      calendarDay: 29
+    },
+    regions: ['Egypt', 'Global'],
+    traditions: ['Coptic Orthodox'],
+    communities: ['Coptic Christians'],
+    isPublicHoliday: true,
+    countries: ['EG'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Coptic Orthodox Church Liturgical Calendar',
+        type: 'religious-authority'
+      }
+    ],
+    shortDescription: 'The celebration of the Nativity of Jesus Christ observed according to the Alexandrian calendar on 29 Kiahk (January 7 Gregorian).',
+    tags: ['coptic', 'christmas', 'nativity', 'kiahk', 'holy-day']
+  },
+
+  // --- Ethiopian Calendar Observances ---
+  {
+    id: 'enkutatash',
+    name: 'Enkutatash (Ethiopian New Year)',
+    type: ObservanceType.NATIONAL_HOLIDAY,
+    calendar: 'ethiopic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'ethiopic',
+      calendarMonth: 1, // 1 Meskerem
+      calendarDay: 1
+    },
+    regions: ['Ethiopia', 'Eritrea', 'Global'],
+    traditions: ['Ethiopian Orthodox', 'National Civil'],
+    communities: ['Ethiopians', 'Eritreans'],
+    isPublicHoliday: true,
+    countries: ['ET', 'ER'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Ministry of Culture and Tourism, Federal Democratic Republic of Ethiopia',
+        type: 'government'
+      }
+    ],
+    shortDescription: 'The first day of the Ethiopian calendar (1 Meskerem / September 11 Gregorian), symbolizing the end of the rainy season and the renewal of springtime.',
+    tags: ['enkutatash', 'ethiopian-new-year', 'meskerem', 'holiday']
+  },
+  {
+    id: 'meskel',
+    name: 'Meskel (Finding of the True Cross)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'ethiopic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'ethiopic',
+      calendarMonth: 1, // 17 Meskerem
+      calendarDay: 17
+    },
+    regions: ['Ethiopia', 'Eritrea'],
+    traditions: ['Ethiopian Orthodox'],
+    communities: ['Ethiopians', 'Eritreans'],
+    isPublicHoliday: true,
+    countries: ['ET'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'UNESCO Intangible Cultural Heritage of Humanity Registry (Meskel)',
+        type: 'international-body'
+      }
+    ],
+    shortDescription: 'A major religious holiday commemorating the discovery of the True Cross by Queen Helena, celebrated with the lighting of large ceremonial bonfires (Demera).',
+    tags: ['meskel', 'demera', 'ethiopian', 'festival', 'unesco']
+  },
+  {
+    id: 'genna',
+    name: 'Genna (Ethiopian Christmas)',
+    type: ObservanceType.HOLY_DAY,
+    calendar: 'ethiopic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'ethiopic',
+      calendarMonth: 4, // 29 Tahsas (Jan 7)
+      calendarDay: 29
+    },
+    regions: ['Ethiopia', 'Eritrea'],
+    traditions: ['Ethiopian Orthodox'],
+    communities: ['Ethiopians', 'Eritreans'],
+    isPublicHoliday: true,
+    countries: ['ET', 'ER'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'Ethiopian Orthodox Tewahedo Church Patriarchate',
+        type: 'religious-authority'
+      }
+    ],
+    shortDescription: 'The celebration of the Nativity of Jesus in Ethiopia and Eritrea on 29 Tahsas (January 7 Gregorian), accompanied by traditional sports and festive church services.',
+    tags: ['genna', 'ethiopian-christmas', 'tahsas', 'holy-day']
+  },
+  {
+    id: 'timkat',
+    name: 'Timkat (Ethiopian Epiphany)',
+    type: ObservanceType.FESTIVAL,
+    calendar: 'ethiopic',
+    dateRule: {
+      type: 'fixed-calendar',
+      calendar: 'ethiopic',
+      calendarMonth: 5, // 11 Tir (Jan 19)
+      calendarDay: 11
+    },
+    regions: ['Ethiopia', 'Eritrea'],
+    traditions: ['Ethiopian Orthodox'],
+    communities: ['Ethiopians', 'Eritreans'],
+    isPublicHoliday: true,
+    countries: ['ET'],
+    verificationStatus: 'verified',
+    sources: [
+      {
+        name: 'UNESCO Intangible Cultural Heritage of Humanity (Timkat / Epiphany)',
+        type: 'international-body'
+      }
+    ],
+    shortDescription: 'Celebrates the baptism of Jesus in the Jordan River with solemn processions of the sacred Tabots, immersion in blessed waters, and vibrant singing and dancing.',
+    tags: ['timkat', 'epiphany', 'ethiopian', 'festival', 'unesco']
   }
 ];
 

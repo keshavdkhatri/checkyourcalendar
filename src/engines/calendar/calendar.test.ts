@@ -140,5 +140,53 @@ describe('Calendar Engine Verification', () => {
       expect(conv1.day).toBe(12); // Shukla Dwadashi
       expect(conv2.day).toBe(12); // Shukla Dwadashi repeated
     });
+
+    it('should correctly convert Chinese Lunisolar dates in 2026', () => {
+      // Chinese New Year 2026: Feb 17, 2026 (Month 1, Day 1)
+      const cnyDate: GregorianDate = { year: 2026, month: 2, day: 17 };
+      const cny = CalendarRegistry.convert(cnyDate)['chinese'];
+      expect(cny.year).toBe(2026);
+      expect(cny.month).toBe(1);
+      expect(cny.day).toBe(1);
+      expect(cny.era).toContain('丙午');
+
+      // Mid-Autumn Festival 2026: Sept 25, 2026 (Month 8, Day 15)
+      const midAutumnDate: GregorianDate = { year: 2026, month: 9, day: 25 };
+      const midAutumn = CalendarRegistry.convert(midAutumnDate)['chinese'];
+      expect(midAutumn.month).toBe(8);
+      expect(midAutumn.day).toBe(15);
+    });
+
+    it('should correctly convert Coptic calendar dates in 2026', () => {
+      // Coptic Christmas: Jan 7, 2026 (29 Kiahk 1742 A.M.)
+      const xmasDate: GregorianDate = { year: 2026, month: 1, day: 7 };
+      const xmas = CalendarRegistry.convert(xmasDate)['coptic'];
+      expect(xmas.year).toBe(1742);
+      expect(xmas.monthName).toBe('Kiahk');
+      expect(xmas.day).toBe(29);
+
+      // Coptic New Year (Nayrouz): Sept 11, 2026 (1 Tout 1743 A.M.)
+      const newYearDate: GregorianDate = { year: 2026, month: 9, day: 11 };
+      const ny = CalendarRegistry.convert(newYearDate)['coptic'];
+      expect(ny.year).toBe(1743);
+      expect(ny.monthName).toBe('Tout');
+      expect(ny.day).toBe(1);
+    });
+
+    it('should correctly convert Ethiopian calendar dates in 2026', () => {
+      // Ethiopian Christmas (Genna): Jan 7, 2026 (29 Tahsas 2018 E.C.)
+      const gennaDate: GregorianDate = { year: 2026, month: 1, day: 7 };
+      const genna = CalendarRegistry.convert(gennaDate)['ethiopic'];
+      expect(genna.year).toBe(2018);
+      expect(genna.monthName).toBe('Tahsas');
+      expect(genna.day).toBe(29);
+
+      // Ethiopian New Year (Enkutatash): Sept 11, 2026 (1 Meskerem 2019 E.C.)
+      const enkutatashDate: GregorianDate = { year: 2026, month: 9, day: 11 };
+      const enkutatash = CalendarRegistry.convert(enkutatashDate)['ethiopic'];
+      expect(enkutatash.year).toBe(2019);
+      expect(enkutatash.monthName).toBe('Meskerem');
+      expect(enkutatash.day).toBe(1);
+    });
   });
 });

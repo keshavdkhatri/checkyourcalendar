@@ -79,18 +79,6 @@ const hasValidStory = Boolean(observance.storyRef && mockStories[observance.stor
 
         <!-- Sidebar Actions -->
         <aside class="sidebar-column">
-          {hasValidStory && (
-            <div class="story-promo-card">
-              <span class="promo-tag">Story Spotlight</span>
-              <h3 class="promo-title">Read the History & Legends</h3>
-              <p class="promo-desc">Discover the ancient context, origin narrative, and traditions behind this day.</p>
-              <a href={`/story/${observance.storyRef}`} class="promo-btn">
-                Read Story Behind the Day
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </a>
-            </div>
-          )}
-
           <div class="meta-card">
             <h3 class="meta-title">Timeframe Note</h3>
             <p class="meta-desc">

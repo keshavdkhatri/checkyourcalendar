@@ -26,11 +26,17 @@ export interface DateRule {
   calculationRef?: string;
 }
 
+export interface ObservanceQueryOptions {
+  calendar?: string;
+  type?: ObservanceType;
+}
+
 export interface Observance {
   id: string;
   name: string;
   type: ObservanceType;
   calendar: string; // anchor calendar system
+  calendars?: string[]; // optional additional calendar systems if cross-calendar
   dateRule: DateRule;
   regions: string[];
   traditions: string[];

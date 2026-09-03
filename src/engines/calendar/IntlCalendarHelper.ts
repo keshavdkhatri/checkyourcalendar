@@ -42,6 +42,10 @@ export function findGregorianViaSearch(
     estYear += 78;
   } else if (targetDate.calendar === 'hindu-vikram') {
     estYear -= 56;
+  } else if (targetDate.calendar === 'coptic') {
+    estYear += 284;
+  } else if (targetDate.calendar === 'ethiopic') {
+    estYear += 8;
   }
 
   const targetVal = targetDate.year * 10000 + targetDate.month * 100 + targetDate.day;

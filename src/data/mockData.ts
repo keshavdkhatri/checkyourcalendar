@@ -19,7 +19,13 @@ export interface Story {
   title: string;
   subtitle: string;
   category: string;
+  tradition: 'vedic' | 'global' | 'islamic' | 'hebrew' | 'persian' | 'saka' | string;
+  traditionLabel: string;
+  storyType: 'fast' | 'festival' | 'commemoration' | 'cultural' | 'historical' | 'spiritual' | string;
+  storyTypeLabel: string;
   publishDate: string;
+  eventDate: string;
+  month: number;
   excerpt: string;
   content: string[];
   sources: string[];
@@ -62,7 +68,13 @@ export const mockStories: Record<string, Story> = {
     title: 'The Legend of Putrada Ekadashi',
     subtitle: 'Why millions observe a sacred fast of devotion and purification',
     category: 'Vedic Traditions',
+    tradition: 'vedic',
+    traditionLabel: 'Vedic / Hindu',
+    storyType: 'fast',
+    storyTypeLabel: 'Fasting / Spiritual',
     publishDate: 'August 24, 2026',
+    eventDate: '2026-08-24',
+    month: 8,
     excerpt: 'The ancient narrative of King Mahajit and the seekers of blessing on the eleventh lunar day of Shravana.',
     content: [
       'Putrada Ekadashi falls on the eleventh lunar day (Ekadashi) of the bright fortnight (Shukla Paksha) of the Hindu month of Shravana (in Amanta and Purnimanta systems). The name "Putrada" translates to "giver of sons," representing a traditional focus on lineage preservation, but in modern contexts, it is celebrated widely for the health and prosperity of all children.',
@@ -87,7 +99,13 @@ export const mockStories: Record<string, Story> = {
     title: 'Honoring Resilience and Memory',
     subtitle: 'The origin of the International Day of Remembrance for Victims of Terrorism',
     category: 'Global Observances',
+    tradition: 'global',
+    traditionLabel: 'Global / International',
+    storyType: 'commemoration',
+    storyTypeLabel: 'Memorials / Commemorations',
     publishDate: 'August 21, 2026',
+    eventDate: '2026-08-21',
+    month: 8,
     excerpt: 'How the global community established a day to stand in solidarity with survivors and remember the victims.',
     content: [
       'The International Day of Remembrance and Tribute to the Victims of Terrorism was established by the United Nations General Assembly in its resolution 72/165 in December 2017. Observed annually on August 21 (and highlighted during the surrounding days), the day aims to honor and support the victims and survivors of terrorism and to promote and protect the full enjoyment of their human rights and fundamental freedoms.',
@@ -111,7 +129,13 @@ export const mockStories: Record<string, Story> = {
     title: 'The Celebration of Krishna Janmashtami',
     subtitle: 'The midnight birth of Krishna and the devotional traditions of Gokulashtami',
     category: 'Vedic Traditions',
+    tradition: 'vedic',
+    traditionLabel: 'Vedic / Hindu',
+    storyType: 'festival',
+    storyTypeLabel: 'Festivals & Celebrations',
     publishDate: 'September 4, 2026',
+    eventDate: '2026-09-04',
+    month: 9,
     excerpt: 'The sacred narrative of Krishna’s birth in Mathura and the joyous traditions of Shravana Krishna Ashtami.',
     content: [
       'Krishna Janmashtami, also known as Gokulashtami or Krishnashtami, marks the celebration of the birth of Krishna, revered as the eighth avatar of Lord Vishnu. According to the Hindu lunisolar calendar, the festival is observed on the eighth tithi (Ashtami) of the dark fortnight (Krishna Paksha / Vad) in the month of Shravana (in the Amanta system followed in Gujarat and Western India).',

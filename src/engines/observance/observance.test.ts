@@ -148,10 +148,38 @@ describe('Observance Engine Verification', () => {
       const invalidRef = 'non-existent-story-key';
       expect(Boolean(invalidRef && mockStories[invalidRef])).toBe(false);
     });
+    it('should correctly sort stories chronologically by associated event date', () => {
+      const stories = Object.values(mockStories).sort((a, b) => {
+        const dateA = a.eventDate || a.publishDate;
+        const dateB = b.eventDate || b.publishDate;
+        return new Date(dateA).getTime() - new Date(dateB).getTime();
+      });
+
+      expect(stories.length).toBe(3);
+      expect(stories[0].slug).toBe('remembrance-victims-terrorism'); // Aug 21
+      expect(stories[1].slug).toBe('putrada-ekadashi'); // Aug 24
+      expect(stories[2].slug).toBe('janmashtami'); // Sep 4
+    });
+
+    it('should ensure all stories have valid tradition, storyType, and month metadata', () => {
+      for (const story of Object.values(mockStories)) {
+        expect(story.tradition).toBeDefined();
+        expect(typeof story.tradition).toBe('string');
+        expect(story.traditionLabel).toBeDefined();
+        expect(story.storyType).toBeDefined();
+        expect(story.storyTypeLabel).toBeDefined();
+        expect(story.month).toBeGreaterThanOrEqual(1);
+        expect(story.month).toBeLessThanOrEqual(12);
+        expect(story.eventDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      }
+    });
   });
 
   describe('Calendar-Specific Monthly View Generation', () => {
-    const supportedCalendars = ['hindu-vikram', 'islamic-civil', 'hebrew', 'persian', 'indian-saka'];
+    const supportedCalendars = [
+      'hindu-vikram', 'islamic-civil', 'hebrew', 'persian',
+      'indian-saka', 'chinese', 'coptic', 'ethiopic'
+    ];
 
     it('should convert all days of September 2026 for each calendar system without error', () => {
       for (const calId of supportedCalendars) {
@@ -179,6 +207,71 @@ describe('Observance Engine Verification', () => {
       expect(formatted).toContain('Shravan');
       expect(formatted).toContain('Vad 8');
       expect(formatted).toContain('2082 VS');
+    });
+
+    it('should match Chinese, Coptic, and Ethiopian observances in 2026', () => {
+      // Chinese New Year: Feb 17, 2026
+      const cnyObs = ObservanceEngine.getObservancesForDate({ year: 2026, month: 2, day: 17 });
+      expect(cnyObs.some(o => o.id === 'chinese-new-year')).toBe(true);
+
+      // Mid-Autumn Festival: Sept 25, 2026
+      const midAutumnObs = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 25 });
+      expect(midAutumnObs.some(o => o.id === 'mid-autumn-festival')).toBe(true);
+
+      // Coptic & Ethiopian New Year: Sept 11, 2026
+      const nyObs = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 11 });
+      expect(nyObs.some(o => o.id === 'coptic-new-year')).toBe(true);
+      expect(nyObs.some(o => o.id === 'enkutatash')).toBe(true);
+    });
+
+    it('should correctly scope observances by calendar on monthly pages', () => {
+      // A. Sept 1, 2026 on Hindu/Vikram Samvat shows Bol Choth & Nag Panchami
+      const hinduSept1 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 1 }, 'hindu-vikram');
+      expect(hinduSept1.some(o => o.id === 'bol-choth')).toBe(true);
+      expect(hinduSept1.some(o => o.id === 'nag-panchami')).toBe(true);
+
+      // B. Sept 1, 2026 on Chinese does NOT show Bol Choth or Nag Panchami
+      const chineseSept1 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 1 }, 'chinese');
+      expect(chineseSept1.some(o => o.id === 'bol-choth')).toBe(false);
+      expect(chineseSept1.some(o => o.id === 'nag-panchami')).toBe(false);
+      expect(chineseSept1.length).toBe(0);
+
+      // C. Sept 2, 2026 on Chinese does NOT show Randhan Chhath
+      const chineseSept2 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 2 }, 'chinese');
+      expect(chineseSept2.some(o => o.id === 'randhan-chhath')).toBe(false);
+
+      // D. Sept 3, 2026 on Chinese does NOT show Shitala Satam
+      const chineseSept3 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 3 }, 'chinese');
+      expect(chineseSept3.some(o => o.id === 'shitala-satam')).toBe(false);
+
+      // E. Sept 4, 2026 on Chinese does NOT show Krishna Janmashtami
+      const chineseSept4 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 4 }, 'chinese');
+      expect(chineseSept4.some(o => o.id === 'janmashtami')).toBe(false);
+
+      // F. Chinese observances appear on Chinese calendar
+      const chineseSept25 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 25 }, 'chinese');
+      expect(chineseSept25.some(o => o.id === 'mid-autumn-festival')).toBe(true);
+
+      // But Mid-Autumn does NOT appear on Hindu/Vikram calendar
+      const hinduSept25 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 25 }, 'hindu-vikram');
+      expect(hinduSept25.some(o => o.id === 'mid-autumn-festival')).toBe(false);
+
+      // G. Global multi-calendar /date page retains all observances
+      const globalSept1 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 1 });
+      expect(globalSept1.some(o => o.id === 'bol-choth')).toBe(true);
+      expect(globalSept1.some(o => o.id === 'nag-panchami')).toBe(true);
+
+      // H. Coptic, Ethiopian, Islamic, Hebrew calendar isolation
+      const copticSept11 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 11 }, 'coptic');
+      expect(copticSept11.some(o => o.id === 'coptic-new-year')).toBe(true);
+      expect(copticSept11.some(o => o.id === 'enkutatash')).toBe(false);
+
+      const ethiopicSept11 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 11 }, 'ethiopic');
+      expect(ethiopicSept11.some(o => o.id === 'enkutatash')).toBe(true);
+      expect(ethiopicSept11.some(o => o.id === 'coptic-new-year')).toBe(false);
+
+      const chineseSept11 = ObservanceEngine.getObservancesForDate({ year: 2026, month: 9, day: 11 }, 'chinese');
+      expect(chineseSept11.length).toBe(0);
     });
   });
 });
