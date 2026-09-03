@@ -10,7 +10,7 @@ const { activeTab } = Astro.props;
   <div class="container header-container">
     <!-- Brand Logo -->
     <a href="/" class="brand" aria-label="CheckYourCalendar home">
-      CheckYourCalendar
+      <span class="brand-text">CheckYourCalendar</span>
     </a>
 
     <!-- Desktop Navigation -->
@@ -29,7 +29,7 @@ const { activeTab } = Astro.props;
       </a>
     </nav>
 
-    <!-- Desktop Search (hidden on mobile, visible on desktop) -->
+    <!-- Desktop Search (hidden on mobile/tablet, visible on desktop >= 1024px) -->
     <form action="/search" method="GET" class="header-search-form desktop-search">
       <label for="header-search-desktop" class="visually-hidden">Search dates, festivals, calendars...</label>
       <span class="material-symbols-outlined search-icon">search</span>
@@ -43,22 +43,22 @@ const { activeTab } = Astro.props;
       />
     </form>
 
-    <!-- Header Actions -->
+    <!-- Header Actions (Mobile & Tablet) -->
     <div class="actions">
       <!-- Mobile Search Toggle Button -->
-      <button class="mobile-search-toggle" aria-expanded="false" aria-controls="mobile-search-bar" aria-label="Toggle search bar">
-        <span class="material-symbols-outlined search-icon">search</span>
+      <button class="action-btn mobile-search-toggle" aria-expanded="false" aria-controls="mobile-search-bar" aria-label="Toggle search bar">
+        <span class="material-symbols-outlined icon search-icon">search</span>
       </button>
       
       <!-- Mobile Menu Toggle Button -->
-      <button class="mobile-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle navigation menu">
-        <span class="material-symbols-outlined menu-icon">menu</span>
-        <span class="material-symbols-outlined close-icon">close</span>
+      <button class="action-btn mobile-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle navigation menu">
+        <span class="material-symbols-outlined icon menu-icon">menu</span>
+        <span class="material-symbols-outlined icon close-icon">close</span>
       </button>
     </div>
   </div>
 
-  <!-- Mobile Search Bar (Toggled on mobile) -->
+  <!-- Mobile Search Bar (Toggled on mobile/tablet) -->
   <div id="mobile-search-bar" class="mobile-search-container" hidden>
     <div class="container">
       <form action="/search" method="GET" class="header-search-form mobile-search-form">
@@ -72,72 +72,122 @@ const { activeTab } = Astro.props;
           class="header-search-input"
           required
         />
-        <button type="submit" class="mobile-search-submit">Go</button>
+        <button type="submit" class="mobile-search-submit">Search</button>
       </form>
     </div>
   </div>
 
   <!-- Mobile Navigation Panel -->
   <nav id="mobile-nav" class="nav-mobile" aria-label="Mobile Navigation" hidden>
-    <a href="/" class={`mobile-link ${activeTab === 'today' ? 'active' : ''}`}>
-      Today
-    </a>
-    <a href="/calendars" class={`mobile-link ${activeTab === 'calendars' ? 'active' : ''}`}>
-      Calendars
-    </a>
-    <a href="/observances" class={`mobile-link ${activeTab === 'observances' ? 'active' : ''}`}>
-      Observances
-    </a>
-    <a href="/about" class={`mobile-link ${activeTab === 'about' ? 'active' : ''}`}>
-      About
-    </a>
+    <div class="mobile-nav-inner container">
+      <div class="mobile-nav-group">
+        <span class="mobile-group-label">Explore</span>
+        <div class="mobile-links-list">
+          <a href="/" class={`mobile-nav-item ${activeTab === 'today' ? 'active' : ''}`}>
+            <span class="material-symbols-outlined nav-item-icon">today</span>
+            <div class="nav-item-content">
+              <span class="nav-item-title">Today</span>
+              <span class="nav-item-desc">Current date & 8 calendar conversions</span>
+            </div>
+            <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
+          </a>
+
+          <a href="/calendars" class={`mobile-nav-item ${activeTab === 'calendars' ? 'active' : ''}`}>
+            <span class="material-symbols-outlined nav-item-icon">calendar_month</span>
+            <div class="nav-item-content">
+              <span class="nav-item-title">Calendars</span>
+              <span class="nav-item-desc">8 global timekeeping traditions</span>
+            </div>
+            <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
+          </a>
+
+          <a href="/observances" class={`mobile-nav-item ${activeTab === 'observances' ? 'active' : ''}`}>
+            <span class="material-symbols-outlined nav-item-icon">celebration</span>
+            <div class="nav-item-content">
+              <span class="nav-item-title">Observances</span>
+              <span class="nav-item-desc">Festivals, fasts & cultural holidays</span>
+            </div>
+            <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
+          </a>
+
+          <a href="/about" class={`mobile-nav-item ${activeTab === 'about' ? 'active' : ''}`}>
+            <span class="material-symbols-outlined nav-item-icon">info</span>
+            <div class="nav-item-content">
+              <span class="nav-item-title">About</span>
+              <span class="nav-item-desc">Methodology, FAQ & calculation science</span>
+            </div>
+            <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Shortcuts in Mobile Nav Footer -->
+      <div class="mobile-nav-footer">
+        <a href="/search" class={`mobile-footer-link ${activeTab === 'search' ? 'active' : ''}`}>
+          <span class="material-symbols-outlined icon">manage_search</span>
+          <span>Search Directory</span>
+        </a>
+        <a href="/contact" class={`mobile-footer-link ${activeTab === 'contact' ? 'active' : ''}`}>
+          <span class="material-symbols-outlined icon">mail</span>
+          <span>Contact & Feedback</span>
+        </a>
+      </div>
+    </div>
   </nav>
 </header>
 
 <script>
-  const toggle = document.querySelector('.mobile-toggle');
-  const mobileNav = document.querySelector('.nav-mobile');
-  const searchToggle = document.querySelector('.mobile-search-toggle');
-  const mobileSearch = document.querySelector('.mobile-search-container');
-  
-  if (toggle && mobileNav) {
-    toggle.addEventListener('click', () => {
-      const expanded = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!expanded));
-      mobileNav.toggleAttribute('hidden');
-      
-      // Close search if opening menu
-      if (!expanded && mobileSearch && !mobileSearch.hasAttribute('hidden')) {
-        mobileSearch.setAttribute('hidden', '');
-        searchToggle?.setAttribute('aria-expanded', 'false');
-      }
-      
-      if (!expanded) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
-    });
+  function setupHeader() {
+    const toggle = document.querySelector('.mobile-toggle');
+    const mobileNav = document.querySelector('.nav-mobile');
+    const searchToggle = document.querySelector('.mobile-search-toggle');
+    const mobileSearch = document.querySelector('.mobile-search-container');
+
+    if (toggle && mobileNav) {
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        mobileNav.toggleAttribute('hidden');
+
+        // Close search if opening menu
+        if (!expanded && mobileSearch && !mobileSearch.hasAttribute('hidden')) {
+          mobileSearch.setAttribute('hidden', '');
+          searchToggle?.setAttribute('aria-expanded', 'false');
+        }
+
+        if (!expanded) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    if (searchToggle && mobileSearch) {
+      searchToggle.addEventListener('click', () => {
+        const expanded = searchToggle.getAttribute('aria-expanded') === 'true';
+        searchToggle.setAttribute('aria-expanded', String(!expanded));
+        mobileSearch.toggleAttribute('hidden');
+
+        // Close menu if opening search
+        if (!expanded && mobileNav && !mobileNav.hasAttribute('hidden')) {
+          mobileNav.setAttribute('hidden', '');
+          toggle?.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+
+        if (!expanded) {
+          const input = mobileSearch.querySelector('input');
+          input?.focus();
+        }
+      });
+    }
   }
 
-  if (searchToggle && mobileSearch) {
-    searchToggle.addEventListener('click', () => {
-      const expanded = searchToggle.getAttribute('aria-expanded') === 'true';
-      searchToggle.setAttribute('aria-expanded', String(!expanded));
-      mobileSearch.toggleAttribute('hidden');
-      
-      // Close menu if opening search
-      if (!expanded && mobileNav && !mobileNav.hasAttribute('hidden')) {
-        mobileNav.setAttribute('hidden', '');
-        toggle?.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      }
-      
-      if (!expanded) {
-        const input = mobileSearch.querySelector('input');
-        input?.focus();
-      }
-    });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupHeader);
+  } else {
+    setupHeader();
   }
 </script>
 
@@ -154,19 +204,24 @@ const { activeTab } = Astro.props;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 80px;
+    height: 64px;
   }
 
   .brand {
     font-family: var(--font-serif);
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-primary);
     letter-spacing: -0.01em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .brand:hover {
-    opacity: 0.85;
+    opacity: 0.88;
   }
 
   .nav-desktop {
@@ -182,6 +237,7 @@ const { activeTab } = Astro.props;
     color: var(--color-on-surface-variant);
     padding: var(--spacing-xs) 0;
     border-bottom: 2px solid transparent;
+    text-decoration: none;
   }
 
   .nav-link:hover {
@@ -197,7 +253,7 @@ const { activeTab } = Astro.props;
   .actions {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 4px;
   }
 
   /* Visually Hidden utility for a11y labels */
@@ -255,22 +311,29 @@ const { activeTab } = Astro.props;
     margin: 0 var(--spacing-md);
   }
 
-  /* Mobile search toggle */
-  .mobile-search-toggle {
+  /* Shared Action Button Styling (Lighter, Integrated 44px Touch Targets) */
+  .action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
     color: var(--color-primary);
-    background: none;
+    background-color: transparent;
     border: none;
     cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
 
-  .mobile-search-toggle:hover {
+  .action-btn:hover {
     background-color: var(--color-surface-container-low);
+  }
+
+  .action-btn .icon {
+    font-size: 1.35rem !important;
   }
 
   .mobile-search-toggle[aria-expanded="true"] {
@@ -278,16 +341,34 @@ const { activeTab } = Astro.props;
     color: var(--color-on-primary-container);
   }
 
+  .mobile-toggle[aria-expanded="true"] {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  .mobile-toggle[aria-expanded="true"] .menu-icon {
+    display: none;
+  }
+
+  .mobile-toggle[aria-expanded="false"] .close-icon {
+    display: none;
+  }
+
   /* Mobile search input container */
   .mobile-search-container {
     position: fixed;
-    top: 80px;
+    top: 64px;
     left: 0;
     width: 100%;
     background-color: var(--color-surface);
     border-bottom: 1px solid var(--color-outline-variant);
     padding: var(--spacing-sm) 0;
+    box-shadow: 0 4px 12px rgba(44, 39, 36, 0.06);
     z-index: 98;
+  }
+
+  .mobile-search-container[hidden] {
+    display: none !important;
   }
 
   .mobile-search-form {
@@ -299,35 +380,11 @@ const { activeTab } = Astro.props;
     color: var(--color-on-primary);
     border: none;
     border-radius: var(--radius-sm);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
-  }
-
-  .mobile-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    color: var(--color-primary);
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .mobile-toggle:hover {
-    background-color: var(--color-surface-container-low);
-  }
-
-  .mobile-toggle[aria-expanded="true"] .menu-icon {
-    display: none;
-  }
-
-  .mobile-toggle[aria-expanded="false"] .close-icon {
-    display: none;
+    flex-shrink: 0;
   }
 
   /* Mobile Navigation Styles */
@@ -335,34 +392,213 @@ const { activeTab } = Astro.props;
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 80px;
+    top: 64px;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100vw;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 64px);
     background-color: var(--color-background);
-    padding: var(--spacing-lg);
-    gap: var(--spacing-md);
+    border-top: 1px solid var(--color-outline-variant);
+    overflow-y: auto;
     z-index: 99;
   }
 
-  .mobile-link {
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: var(--color-on-background);
-    padding: var(--spacing-sm) 0;
-    border-bottom: 1px solid var(--color-outline);
+  .nav-mobile[hidden] {
+    display: none !important;
   }
 
-  .mobile-link:hover, .mobile-link.active {
+  .mobile-nav-inner {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-xl);
+    gap: var(--spacing-md);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .mobile-nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .mobile-group-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-on-surface-variant);
+    padding: 0 2px;
+  }
+
+  .mobile-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 10px 14px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .mobile-nav-item:hover {
+    background-color: var(--color-surface-container-low);
+    border-color: var(--color-outline-variant);
+  }
+
+  .nav-item-icon {
+    font-size: 1.2rem !important;
+    color: var(--color-primary);
+    background-color: var(--color-surface-dim);
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-item-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nav-item-title {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    line-height: 1.2;
+  }
+
+  .nav-item-desc {
+    font-size: 0.75rem;
+    color: var(--color-on-surface-variant);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+    margin-top: 2px;
+  }
+
+  .nav-item-arrow {
+    font-size: 1.125rem !important;
+    color: var(--color-outline-variant);
+    flex-shrink: 0;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .mobile-nav-item:hover .nav-item-arrow {
+    color: var(--color-primary);
+    transform: translateX(2px);
+  }
+
+  /* Refined Editorial Active State */
+  .mobile-nav-item.active {
+    background-color: var(--color-surface-container-low);
+    border-color: var(--color-primary);
+    border-left: 4px solid var(--color-primary);
+  }
+
+  .mobile-nav-item.active .nav-item-title {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .mobile-nav-item.active .nav-item-desc {
+    color: var(--color-on-surface-variant);
+  }
+
+  .mobile-nav-item.active .nav-item-icon {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .mobile-nav-item.active .nav-item-arrow {
+    color: var(--color-primary);
+  }
+
+  /* Mobile Nav Footer Shortcuts */
+  .mobile-nav-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-outline-variant);
+  }
+
+  .mobile-footer-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-on-surface-variant);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .mobile-footer-link:hover {
+    background-color: var(--color-surface-dim);
+    color: var(--color-primary);
+    border-color: var(--color-outline-variant);
+  }
+
+  .mobile-footer-link.active {
+    background-color: var(--color-surface-container-low);
     color: var(--color-primary);
     border-color: var(--color-primary);
   }
 
+  .mobile-footer-link .icon {
+    font-size: 1rem !important;
+    color: var(--color-primary);
+  }
+
+  @media (min-width: 390px) {
+    .brand {
+      font-size: 1.35rem;
+    }
+  }
+
+  @media (min-width: 480px) {
+    .brand {
+      font-size: 1.5rem;
+    }
+  }
+
   @media (min-width: 768px) {
+    .header-container {
+      height: 80px;
+    }
+
+    .brand {
+      font-size: 1.75rem;
+    }
+
     .nav-desktop {
       display: flex;
     }
-    
+
     .mobile-toggle {
       display: none;
     }
