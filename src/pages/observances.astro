@@ -13,10 +13,11 @@ const observances = allObservances.map(obs => {
     id: obs.id,
     name: obs.name,
     type: obs.type,
-    calendarName: adapter.name,
+    calendarName: adapter ? adapter.name : obs.calendar,
     regionName: obs.regions.join(', ') || 'Global',
     summary: obs.shortDescription,
-    storyRef: obs.storyRef
+    storyRef: obs.storyRef,
+    isPublicHoliday: obs.isPublicHoliday
   };
 });
 ---
@@ -35,33 +36,93 @@ const observances = allObservances.map(obs => {
     <!-- Filter chips -->
     <div class="filters-container">
       <span class="filter-label">Filter by type:</span>
-      <div class="filter-chips">
-        <button class="chip active">All</button>
-        <button class="chip">Festivals</button>
-        <button class="chip">Fasting Days</button>
-        <button class="chip">Commemorations</button>
-        <button class="chip">Public Holidays</button>
+      <div class="filter-chips" role="tablist">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="festival">Festivals</button>
+        <button class="chip" data-filter="fast">Fasting Days</button>
+        <button class="chip" data-filter="commemoration">Commemorations</button>
+        <button class="chip" data-filter="holiday">Public Holidays</button>
       </div>
     </div>
 
     <!-- Observances list -->
-    <section class="observances-grid">
+    <section class="observances-grid" id="observances-grid">
       {observances.map(obs => (
-        <ObservanceCard 
-          id={obs.id}
-          name={obs.name}
-          type={obs.type}
-          calendarName={obs.calendarName}
-          regionName={obs.regionName}
-          summary={obs.summary}
-          storyRef={obs.storyRef}
-        />
+        <div class="observance-card-item" data-type={obs.type} data-holiday={obs.isPublicHoliday ? 'true' : 'false'}>
+          <ObservanceCard 
+            id={obs.id}
+            name={obs.name}
+            type={obs.type}
+            calendarName={obs.calendarName}
+            regionName={obs.regionName}
+            summary={obs.summary}
+            storyRef={obs.storyRef}
+          />
+        </div>
       ))}
     </section>
+
+    <!-- Empty Filter State -->
+    <div id="no-filter-results" class="no-results-message" style="display: none;">
+      <p>No observances found in this category.</p>
+    </div>
   </main>
 
   <Footer />
 </Layout>
+
+<script>
+  function setupObservanceFilters() {
+    const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chips .chip');
+    const cards = document.querySelectorAll<HTMLElement>('.observance-card-item');
+    const noResults = document.getElementById('no-filter-results');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const filter = chip.getAttribute('data-filter') || 'all';
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const type = card.getAttribute('data-type') || '';
+          const isHoliday = card.getAttribute('data-holiday') === 'true';
+
+          let matches = false;
+          if (filter === 'all') {
+            matches = true;
+          } else if (filter === 'festival') {
+            matches = type === 'festival' || type === 'holy_day';
+          } else if (filter === 'fast') {
+            matches = type === 'fast';
+          } else if (filter === 'commemoration') {
+            matches = type === 'commemoration' || type === 'international_day';
+          } else if (filter === 'holiday') {
+            matches = type === 'national_holiday' || isHoliday;
+          }
+
+          if (matches) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupObservanceFilters);
+  } else {
+    setupObservanceFilters();
+  }
+</script>
 
 <style>
   .main-content {
@@ -139,6 +200,21 @@ const observances = allObservances.map(obs => {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+  }
+
+  .observance-card-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .no-results-message {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-size: 1rem;
+    background-color: var(--color-surface);
+    border: 1px dashed var(--color-outline);
+    border-radius: var(--radius-md);
   }
 
   @media (min-width: 768px) {

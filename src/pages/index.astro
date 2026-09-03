@@ -231,7 +231,7 @@ const observances = matchedObservances.map(obs => {
         }
         
         // Find if there is a story link in the new observances
-        const storyLink = newObservancesList?.querySelector('.story-link, .title-link') as HTMLAnchorElement | null;
+        const storyLink = newObservancesList?.querySelector('.story-link') as HTMLAnchorElement | null;
         if (storyLink && storyTeaserCard) {
           storyTeaserCard.style.display = '';
           const href = storyLink.getAttribute('href') || '';

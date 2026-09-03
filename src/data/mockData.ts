@@ -105,5 +105,31 @@ export const mockStories: Record<string, Story> = {
     relatedDates: [
       { name: 'Friday, August 21, 2026', url: '/date/2026-08-21' }
     ]
+  },
+  'janmashtami': {
+    slug: 'janmashtami',
+    title: 'The Celebration of Krishna Janmashtami',
+    subtitle: 'The midnight birth of Krishna and the devotional traditions of Gokulashtami',
+    category: 'Vedic Traditions',
+    publishDate: 'September 4, 2026',
+    excerpt: 'The sacred narrative of Krishna’s birth in Mathura and the joyous traditions of Shravana Krishna Ashtami.',
+    content: [
+      'Krishna Janmashtami, also known as Gokulashtami or Krishnashtami, marks the celebration of the birth of Krishna, revered as the eighth avatar of Lord Vishnu. According to the Hindu lunisolar calendar, the festival is observed on the eighth tithi (Ashtami) of the dark fortnight (Krishna Paksha / Vad) in the month of Shravana (in the Amanta system followed in Gujarat and Western India).',
+      'According to sacred accounts in the Bhagavata Purana and Harivamsa, Krishna was born in Mathura to Devaki and Vasudeva in a prison cell under the reign of King Kamsa. At midnight, amidst heavy rains and the auspicious Rohini nakshatra, Vasudeva miraculously carried the newborn infant across the Yamuna river to safety in Gokul, where he was nurtured by foster parents Nanda and Yashoda.',
+      'The festival is observed with day-long fasting, night-long prayer vigils (Jagran), reading of sacred texts, and jubilant midnight worship marking the moment of birth. In Gujarat and Maharashtra, the festivities continue the next day with Nand Mahotsav, celebrating community joy, sharing festive delicacies, and performing traditional devotional dances.'
+    ],
+    sources: [
+      'Bhagavata Purana (Srimad Bhagavatam), Skandha 10, Chapters 3-4',
+      'Ministry of Culture, Government of India - National Festival Documentation',
+      'Gujarat State Cultural Portal - Traditional Celebrations'
+    ],
+    relatedObservances: [
+      { name: 'Shravan Putrada Ekadashi', url: '/observance/putrada-ekadashi' },
+      { name: 'Shitala Satam', url: '/observance/shitala-satam' },
+      { name: 'Nand Mahotsav', url: '/observance/nand-mahotsav' }
+    ],
+    relatedDates: [
+      { name: 'Friday, September 4, 2026', url: '/date/2026-09-04' }
+    ]
   }
 };

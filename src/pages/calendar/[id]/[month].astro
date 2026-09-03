@@ -1,0 +1,551 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { CalendarRegistry } from '../../../engines/calendar/registry';
+import { ObservanceEngine } from '../../../engines/observance/engine';
+
+export async function getStaticPaths() {
+  const adapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian');
+  const months = [
+    '2026-01', '2026-02', '2026-03', '2026-04',
+    '2026-05', '2026-06', '2026-07', '2026-08',
+    '2026-09', '2026-10', '2026-11', '2026-12'
+  ];
+
+  const paths = [];
+  for (const adapter of adapters) {
+    for (const month of months) {
+      paths.push({
+        params: { id: adapter.id, month },
+      });
+    }
+  }
+  return paths;
+}
+
+const { id, month } = Astro.params;
+const adapter = CalendarRegistry.getAdapter(id || '');
+
+if (!adapter || !month) {
+  return Astro.redirect('/404');
+}
+
+const [yearStr, monthStr] = month.split('-');
+const year = parseInt(yearStr, 10);
+const monthNum = parseInt(monthStr, 10);
+
+if (isNaN(year) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+  return Astro.redirect('/404');
+}
+
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+const gregorianMonthName = monthNames[monthNum - 1];
+const daysInMonth = new Date(year, monthNum, 0).getDate();
+
+// Generate day conversions for this specific calendar
+const days = [];
+for (let d = 1; d <= daysInMonth; d++) {
+  const dateObj = { year, month: monthNum, day: d };
+  const jsDate = new Date(year, monthNum - 1, d);
+  const dayOfWeek = jsDate.getDay();
+  const converted = adapter.fromGregorian(dateObj);
+  const formatted = adapter.format(converted);
+  const observances = ObservanceEngine.getObservancesForDate(dateObj);
+  const dateKey = `${year}-${String(monthNum).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  days.push({
+    dayNum: d,
+    dayOfWeek,
+    weekdayShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayOfWeek],
+    weekdayLong: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek],
+    dateKey,
+    converted,
+    formatted,
+    observances
+  });
+}
+
+// Compute calendar month range representation
+const firstDayConv = days[0].converted;
+const lastDayConv = days[days.length - 1].converted;
+let primaryMonthTitle = '';
+if (firstDayConv.monthName === lastDayConv.monthName) {
+  primaryMonthTitle = `${firstDayConv.monthName} ${firstDayConv.year} ${firstDayConv.era || ''}`.trim();
+} else {
+  primaryMonthTitle = `${firstDayConv.monthName} – ${lastDayConv.monthName} ${lastDayConv.year} ${lastDayConv.era || ''}`.trim();
+}
+
+// Month Navigation
+const prevMonthStr = monthNum > 1 ? `2026-${String(monthNum - 1).padStart(2, '0')}` : null;
+const nextMonthStr = monthNum < 12 ? `2026-${String(monthNum + 1).padStart(2, '0')}` : null;
+const prevMonthName = monthNum > 1 ? monthNames[monthNum - 2] : null;
+const nextMonthName = monthNum < 12 ? monthNames[monthNum] : null;
+
+// Available calendars for quick switching
+const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian');
+---
+
+<Layout title={`${adapter.name} - ${gregorianMonthName} ${year}`} description={`Monthly view for ${adapter.name} corresponding to ${gregorianMonthName} ${year}.`}>
+  <Header activeTab="calendars" />
+
+  <!-- Breadcrumbs -->
+  <nav class="container breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href="/calendars">Calendars</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href={`/calendar/${adapter.id}`}>{adapter.name}</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>{gregorianMonthName} {year}</li>
+    </ol>
+  </nav>
+
+  <main class="container main-content">
+    <!-- Month Header & Summary -->
+    <section class="month-header-card">
+      <div class="header-left">
+        <span class="calendar-badge">{adapter.name}</span>
+        <h1 class="month-title">{primaryMonthTitle}</h1>
+        <p class="gregorian-range">Corresponding to {gregorianMonthName} 1 – {gregorianMonthName} {daysInMonth}, {year} (Gregorian)</p>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="month-nav">
+        {prevMonthStr ? (
+          <a href={`/calendar/${adapter.id}/${prevMonthStr}`} class="nav-btn prev-btn" title={`Go to ${prevMonthName} 2026`}>
+            <span class="material-symbols-outlined icon">arrow_back</span>
+            {prevMonthName}
+          </a>
+        ) : (
+          <span class="nav-btn disabled">
+            <span class="material-symbols-outlined icon">arrow_back</span>
+            Start
+          </span>
+        )}
+
+        <span class="current-month-label">{gregorianMonthName} {year}</span>
+
+        {nextMonthStr ? (
+          <a href={`/calendar/${adapter.id}/${nextMonthStr}`} class="nav-btn next-btn" title={`Go to ${nextMonthName} 2026`}>
+            {nextMonthName}
+            <span class="material-symbols-outlined icon">arrow_forward</span>
+          </a>
+        ) : (
+          <span class="nav-btn disabled">
+            End
+            <span class="material-symbols-outlined icon">arrow_forward</span>
+          </span>
+        )}
+      </div>
+    </section>
+
+    <!-- Calendar System Switcher Pills -->
+    <section class="calendar-switcher">
+      <span class="switcher-label">View another calendar for {gregorianMonthName} {year}:</span>
+      <div class="switcher-pills">
+        {allAdapters.map(ad => (
+          <a 
+            href={`/calendar/${ad.id}/${month}`} 
+            class={`pill ${ad.id === adapter.id ? 'active' : ''}`}
+          >
+            {ad.name}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Monthly Date Cards Grid -->
+    <section class="month-grid-section">
+      <h2 class="section-heading">Daily Date Conversions & Observances</h2>
+      
+      <div class="days-list-grid">
+        {days.map(d => {
+          const isWeekend = d.dayOfWeek === 0 || d.dayOfWeek === 6;
+          const hasObservances = d.observances.length > 0;
+          
+          return (
+            <article class={`day-card ${isWeekend ? 'weekend' : ''} ${hasObservances ? 'has-observance' : ''}`}>
+              <div class="day-card-header">
+                <div class="gregorian-date-badge">
+                  <span class="day-number">{d.dayNum}</span>
+                  <span class="day-weekday">{d.weekdayShort}</span>
+                </div>
+                
+                <a href={`/date/${d.dateKey}`} class="day-detail-link" title={`View multi-calendar details for ${d.dateKey}`}>
+                  <span>All Calendars</span>
+                  <span class="material-symbols-outlined icon">north_east</span>
+                </a>
+              </div>
+
+              <div class="converted-info">
+                <span class="converted-label">{adapter.name}</span>
+                <p class="converted-date-str">{d.formatted}</p>
+              </div>
+
+              {hasObservances && (
+                <div class="observances-section">
+                  <span class="obs-header">Observances:</span>
+                  <div class="obs-tags">
+                    {d.observances.map(obs => (
+                      <div class="obs-tag-item">
+                        <a href={`/observance/${obs.id}`} class="obs-name-link">
+                          <span class="material-symbols-outlined obs-icon">event_note</span>
+                          {obs.name}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .breadcrumbs {
+    padding-top: var(--spacing-md);
+    padding-bottom: 0;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb-item a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .breadcrumb-item.active {
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .separator {
+    font-size: 1rem !important;
+    margin: 0 4px;
+    color: var(--color-outline-variant);
+  }
+
+  .main-content {
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  /* Month Header Card */
+  .month-header-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  @media (min-width: 768px) {
+    .month-header-card {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .calendar-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-tertiary);
+  }
+
+  .month-title {
+    font-family: var(--font-serif);
+    font-size: 1.85rem;
+    color: var(--color-primary);
+    line-height: 1.2;
+    margin: var(--spacing-xs) 0;
+  }
+
+  .gregorian-range {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  /* Month Navigator */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface-dim);
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-outline-variant);
+    align-self: flex-start;
+  }
+
+  @media (min-width: 768px) {
+    .month-nav {
+      align-self: center;
+    }
+  }
+
+  .current-month-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    padding: 0 8px;
+  }
+
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .nav-btn:hover:not(.disabled) {
+    background-color: var(--color-surface);
+    text-decoration: underline;
+  }
+
+  .nav-btn.disabled {
+    color: var(--color-outline);
+    cursor: not-allowed;
+  }
+
+  .nav-btn .icon {
+    font-size: 0.875rem !important;
+  }
+
+  /* Switcher Pills */
+  .calendar-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .switcher-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface-variant);
+  }
+
+  .switcher-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .pill {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-on-surface);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .pill:hover {
+    background-color: var(--color-surface-dim);
+    border-color: var(--color-primary);
+  }
+
+  .pill.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+  }
+
+  /* Section Heading */
+  .section-heading {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+  }
+
+  /* Grid Layout for Month Days */
+  .days-list-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  @media (min-width: 640px) {
+    .days-list-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .days-list-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .day-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .day-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(139, 74, 63, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .day-card.has-observance {
+    border-left: 4px solid var(--color-secondary);
+  }
+
+  .day-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .gregorian-date-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .day-number {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .day-weekday {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+  }
+
+  .day-detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    text-decoration: none;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+  }
+
+  .day-detail-link:hover {
+    color: var(--color-primary);
+    background-color: var(--color-surface-dim);
+    text-decoration: underline;
+  }
+
+  .day-detail-link .icon {
+    font-size: 0.75rem !important;
+  }
+
+  .converted-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .converted-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface-variant);
+  }
+
+  .converted-date-str {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-on-surface);
+    line-height: 1.3;
+  }
+
+  /* Observances in Day Card */
+  .observances-section {
+    margin-top: auto;
+    padding-top: var(--spacing-xs);
+    border-top: 1px dashed var(--color-outline);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .obs-header {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-secondary);
+  }
+
+  .obs-tags {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .obs-name-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+    line-height: 1.3;
+  }
+
+  .obs-name-link:hover {
+    text-decoration: underline;
+  }
+
+  .obs-icon {
+    font-size: 0.875rem !important;
+    color: var(--color-secondary);
+    flex-shrink: 0;
+  }
+</style>

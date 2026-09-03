@@ -4,6 +4,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { ObservanceEngine } from '../../engines/observance/engine';
 import { CalendarRegistry } from '../../engines/calendar/registry';
+import { mockStories } from '../../data/mockData';
 
 export async function getStaticPaths() {
   const observances = ObservanceEngine.getAllObservances();
@@ -29,7 +30,9 @@ const typeLabelMap: Record<string, string> = {
 };
 
 const typeLabel = typeLabelMap[observance.type] || observance.type;
-const adapter = CalendarRegistry.getAdapter(observance.calendar)!;
+const adapter = CalendarRegistry.getAdapter(observance.calendar);
+const adapterName = adapter ? adapter.name : observance.calendar;
+const hasValidStory = Boolean(observance.storyRef && mockStories[observance.storyRef]);
 ---
 
 <Layout title={observance.name} description={observance.shortDescription}>
@@ -64,7 +67,7 @@ const adapter = CalendarRegistry.getAdapter(observance.calendar)!;
             <div class="calendar-info-box">
               <div class="info-row">
                 <span class="info-label">Calendar System</span>
-                <span class="info-val">{adapter.name}</span>
+                <span class="info-val">{adapterName}</span>
               </div>
               <div class="info-row">
                 <span class="info-label">Region celebrated</span>
@@ -76,7 +79,7 @@ const adapter = CalendarRegistry.getAdapter(observance.calendar)!;
 
         <!-- Sidebar Actions -->
         <aside class="sidebar-column">
-          {observance.storyRef && (
+          {hasValidStory && (
             <div class="story-promo-card">
               <span class="promo-tag">Story Spotlight</span>
               <h3 class="promo-title">Read the History & Legends</h3>
