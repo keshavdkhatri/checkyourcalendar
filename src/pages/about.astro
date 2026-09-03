@@ -76,30 +76,66 @@ import Footer from '../components/Footer.astro';
         <h2 id="faq">Frequently Asked Questions</h2>
         <div class="faq-list">
           <div class="faq-item">
-            <h3>Which calendars are supported in V1?</h3>
+            <h3>How do I see today's date in different calendar systems?</h3>
             <p>
-              CheckYourCalendar currently provides full mathematical and cultural conversion for 8 major systems: <strong>Vikram Samvat (Gujarati/Hindu)</strong>, <strong>Hijri (Islamic Civil / Umm al-Qura)</strong>, <strong>Hebrew</strong>, <strong>Persian (Solar Hijri)</strong>, <strong>Indian National (Saka)</strong>, <strong>Chinese Traditional (Lunisolar)</strong>, <strong>Coptic (Alexandrian)</strong>, and <strong>Ethiopian (Ge'ez)</strong>.
+              On our <a href="/">Homepage</a>, CheckYourCalendar automatically detects your local date and displays its exact real-time conversion across all 8 supported calendar systems simultaneously, alongside any major cultural observances occurring today.
             </p>
           </div>
 
           <div class="faq-item">
-            <h3>Why might a traditional date vary by one day regionally?</h3>
+            <h3>Which calendar systems does CheckYourCalendar support?</h3>
             <p>
-              Certain lunar and lunisolar traditions (such as Islamic Hijri and Hindu Panchang) historically rely on local astronomical conditions—such as physical crescent moon sightings or sunrise tithi timings in specific timezones. We use standardized civil and astronomical algorithms as a baseline, while noting regional variance factors on relevant observance pages.
+              We provide full mathematical and astronomical conversions for 8 major historical and civil systems:
+              <strong>Vikram Samvat (Gujarati/Hindu)</strong>,
+              <strong>Hijri (Islamic Civil / Umm al-Qura)</strong>,
+              <strong>Hebrew (Jewish)</strong>,
+              <strong>Persian (Solar Hijri)</strong>,
+              <strong>Indian National (Saka)</strong>,
+              <strong>Chinese Traditional (Lunisolar)</strong>,
+              <strong>Coptic (Alexandrian)</strong>, and
+              <strong>Ethiopian (Ge'ez)</strong>.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How are the calendar conversions calculated?</h3>
+            <p>
+              Each calendar uses dedicated calculation engines that map UTC Gregorian coordinates to traditional astronomical rules, lunisolar intercalations, and epoch standards (such as Anno Martyrum for Coptic, Vikram Samvat eras for Hindu Panchang, and the 60-year sexagenary cycle for Chinese).
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why do lunar and lunisolar festival dates change every year on the Gregorian calendar?</h3>
+            <p>
+              A solar year is approximately 365.24 days, whereas 12 lunar cycles equal roughly 354 days. Because pure lunar calendars (like the Hijri calendar) and lunisolar calendars (like Hindu Vikram Samvat, Hebrew, and Chinese) track moon phases, their months shift relative to the fixed solar Gregorian calendar, causing festivals like Diwali, Ramadan, Pesach, and Chinese New Year to fall on different Gregorian dates each year.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>Why might a traditional observance differ by one day depending on location?</h3>
+            <p>
+              Certain traditions rely on local astronomical phenomena—such as the physical sighting of the lunar crescent or sunrise-based tithi boundaries in a specific timezone. We use standardized civil and astronomical algorithms as an authoritative baseline, while noting regional sighting variations where applicable.
             </p>
           </div>
 
           <div class="faq-item">
             <h3>What is the difference between a calendar system and an observance?</h3>
             <p>
-              A <strong>calendar system</strong> is a mathematical and astronomical framework for dividing time (years, months, cycles). An <strong>observance</strong> is a specific cultural festival, religious holy day, fast, or commemoration that occurs on designated coordinates within that system.
+              A <strong>calendar system</strong> is a framework for measuring time and organizing years and months. An <strong>observance</strong> is a specific cultural festival, religious holy day, fast, or public holiday that occurs on a designated coordinate within that calendar system.
             </p>
           </div>
 
           <div class="faq-item">
-            <h3>How do I report a discrepancy or suggest an observance?</h3>
+            <h3>How does the Chinese lunisolar calendar work?</h3>
             <p>
-              If you notice a calendar calculation variance or wish to suggest an observance for addition, please reach out via our <a href="/contact">Contact Page</a>. We review every submission against primary astronomical and cultural sources.
+              The traditional Chinese calendar (农历 / Nónglì) aligns lunar months with solar terms (Jiéqì) to keep festivals aligned with astronomical seasons. It identifies each year by combining the Ten Heavenly Stems and Twelve Earthly Branches with corresponding zodiac animals (such as 丙午 Bing-Wu, the Year of the Horse).
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>How can I report a calculation discrepancy or suggest an observance?</h3>
+            <p>
+              If you notice a calendar variance or would like to suggest an observance, please submit your feedback through our <a href="/contact">Contact Page</a>. We review all suggestions against primary astronomical, academic, and cultural records.
             </p>
           </div>
         </div>
