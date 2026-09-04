@@ -1,0 +1,270 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { ObservanceEngine } from '../../../engines/observance/engine';
+import { useTranslations } from '../../../i18n/utils';
+import { getLocalizedCalendarInfo } from '../../../i18n/calendarTranslations';
+import { getLocalizedObservance } from '../../../i18n/observanceTranslations';
+import type { Locale } from '../../../i18n/types';
+
+export async function getStaticPaths() {
+  const observances = ObservanceEngine.getAllObservances();
+  const locales: Locale[] = ['hi', 'gu'];
+  const paths = [];
+  for (const lang of locales) {
+    for (const obs of observances) {
+      paths.push({
+        params: { lang, slug: obs.id },
+      });
+    }
+  }
+  return paths;
+}
+
+const { lang, slug } = Astro.params as { lang: Locale; slug: string };
+const rawObservance = ObservanceEngine.getObservanceById(slug);
+
+if (!rawObservance) {
+  return Astro.redirect(`/${lang}/404`);
+}
+
+const t = useTranslations(lang);
+const localizedObs = getLocalizedObservance(rawObservance.id, lang);
+const obsName = localizedObs ? localizedObs.name : rawObservance.name;
+const obsDesc = localizedObs ? localizedObs.shortDescription : rawObservance.shortDescription;
+
+const typeLabel = t.common.observanceTypes[rawObservance.type as keyof typeof t.common.observanceTypes] || rawObservance.type;
+const calInfo = getLocalizedCalendarInfo(rawObservance.calendar);
+const calName = calInfo ? calInfo.name[lang] : rawObservance.calendar;
+
+const aboutTitle = lang === 'hi' ? 'पर्व का परिचय एवं महत्व' : 'તહેવારનો પરિચય અને મહત્વ';
+const calSectionTitle = lang === 'hi' ? 'कैलेंडर और काल-गणना' : 'કેલેન્ડર અને સમયગણના';
+const noteTitle = lang === 'hi' ? 'गणना संबंधी टिप्पणी' : 'ગણતરી સંબંધી નોંધ';
+const noteText = lang === 'hi'
+  ? 'पर्वों की गणना खगोलीय चंद्र-सूर्य चक्रों और क्षेत्रीय परंपराओं पर आधारित होती है। सौर ग्रेगोरियन कैलेंडर पर इनकी तिथियां प्रतिवर्ष बदलती हैं।'
+  : 'પર્વોની ગણતરી ખગોળીય ચંદ્ર-સૂર્ય ચક્રો અને પરંપરાઓ પર આધારિત હોય છે. સૌર ગ્રેગોરિયન કેલેન્ડર પર આ તિથિઓ દર વર્ષે બદલાય છે.';
+---
+
+<Layout 
+  title={obsName} 
+  description={obsDesc}
+  lang={lang}
+>
+  <Header activeTab="observances" lang={lang} />
+
+  <!-- Breadcrumbs -->
+  <nav class="container breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item"><a href={`/${lang}`}>{t.common.breadcrumbsHome}</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href={`/${lang}/observances`}>{t.directories.observancesHeading}</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>{obsName}</li>
+    </ol>
+  </nav>
+
+  <main class="container main-content">
+    <article class="observance-detail">
+      <header class="detail-header">
+        <span class="detail-type">{typeLabel}</span>
+        <h1 class="detail-title">{obsName}</h1>
+      </header>
+
+      <div class="detail-grid">
+        <!-- Main Info -->
+        <div class="info-column">
+          <section class="section-box">
+            <h2 class="section-title">{aboutTitle}</h2>
+            <p class="summary-text">{obsDesc}</p>
+          </section>
+
+          <section class="section-box">
+            <h2 class="section-title">{calSectionTitle}</h2>
+            <div class="calendar-info-box">
+              <div class="info-row">
+                <span class="info-label">{t.common.calendarSystem}</span>
+                <span class="info-val">{calName}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">{t.common.regionCelebrated}</span>
+                <span class="info-val">{rawObservance.regions.join(', ') || 'Global'}</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <aside class="sidebar-column">
+          <div class="meta-card">
+            <h3 class="meta-title">{noteTitle}</h3>
+            <p class="meta-desc">{noteText}</p>
+          </div>
+        </aside>
+      </div>
+    </article>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<style>
+  .breadcrumbs {
+    padding-top: var(--spacing-md);
+    padding-bottom: 0;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+  }
+
+  .breadcrumb-item a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .breadcrumb-item.active {
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .separator {
+    font-size: 1rem !important;
+    margin: 0 4px;
+    color: var(--color-outline-variant);
+  }
+
+  .main-content {
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .observance-detail {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .detail-header {
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-sm);
+  }
+
+  .detail-type {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .detail-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    line-height: 1.2;
+    margin-top: var(--spacing-xs);
+  }
+
+  /* Grid details */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+  }
+
+  .info-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .section-box {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .summary-text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+  }
+
+  .calendar-info-box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px dashed var(--color-outline);
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .info-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .info-val {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-on-surface);
+  }
+
+  /* Sidebar styling */
+  .sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .meta-card {
+    border: 1px dashed var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+  }
+
+  .meta-title {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--color-on-surface);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .meta-desc {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.4;
+  }
+
+  @media (min-width: 768px) {
+    .detail-grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+</style>

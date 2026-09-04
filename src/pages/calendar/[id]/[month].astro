@@ -116,12 +116,12 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
         {prevMonthStr ? (
           <a href={`/calendar/${adapter.id}/${prevMonthStr}`} class="nav-btn prev-btn" title={`Go to ${prevMonthName} 2026`}>
             <span class="material-symbols-outlined icon">arrow_back</span>
-            {prevMonthName}
+            <span>{prevMonthName}</span>
           </a>
         ) : (
           <span class="nav-btn disabled">
             <span class="material-symbols-outlined icon">arrow_back</span>
-            Start
+            <span>Start</span>
           </span>
         )}
 
@@ -129,12 +129,12 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
 
         {nextMonthStr ? (
           <a href={`/calendar/${adapter.id}/${nextMonthStr}`} class="nav-btn next-btn" title={`Go to ${nextMonthName} 2026`}>
-            {nextMonthName}
+            <span>{nextMonthName}</span>
             <span class="material-symbols-outlined icon">arrow_forward</span>
           </a>
         ) : (
           <span class="nav-btn disabled">
-            End
+            <span>End</span>
             <span class="material-symbols-outlined icon">arrow_forward</span>
           </span>
         )}
@@ -192,7 +192,7 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
                       <div class="obs-tag-item">
                         <a href={`/observance/${obs.id}`} class="obs-name-link">
                           <span class="material-symbols-outlined obs-icon">event_note</span>
-                          {obs.name}
+                          <span>{obs.name}</span>
                         </a>
                       </div>
                     ))}
@@ -328,6 +328,10 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
 
   .nav-btn:hover:not(.disabled) {
     background-color: var(--color-surface);
+    text-decoration: none;
+  }
+
+  .nav-btn:hover:not(.disabled) span:not(.icon) {
     text-decoration: underline;
   }
 
@@ -475,6 +479,10 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
   .day-detail-link:hover {
     color: var(--color-primary);
     background-color: var(--color-surface-dim);
+    text-decoration: none;
+  }
+
+  .day-detail-link:hover span:not(.icon) {
     text-decoration: underline;
   }
 
@@ -540,6 +548,10 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
   }
 
   .obs-name-link:hover {
+    text-decoration: none;
+  }
+
+  .obs-name-link:hover span:not(.obs-icon) {
     text-decoration: underline;
   }
 

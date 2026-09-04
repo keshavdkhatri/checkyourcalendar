@@ -1,0 +1,244 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ObservanceCard from '../../components/ObservanceCard.astro';
+import { ObservanceEngine } from '../../engines/observance/engine';
+import { useTranslations } from '../../i18n/utils';
+import { getLocalizedCalendarInfo } from '../../i18n/calendarTranslations';
+import { getLocalizedObservance } from '../../i18n/observanceTranslations';
+import type { Locale } from '../../i18n/types';
+
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'hi' } },
+    { params: { lang: 'gu' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = useTranslations(lang);
+
+const allObservances = ObservanceEngine.getAllObservances();
+const observances = allObservances.map(obs => {
+  const info = getLocalizedCalendarInfo(obs.calendar);
+  const localizedObs = getLocalizedObservance(obs.id, lang);
+  return {
+    id: obs.id,
+    name: localizedObs ? localizedObs.name : obs.name,
+    type: obs.type,
+    calendarName: info ? info.name[lang] : obs.calendar,
+    regionName: obs.regions.join(', ') || 'Global',
+    summary: localizedObs ? localizedObs.shortDescription : obs.shortDescription,
+    storyRef: obs.storyRef,
+    isPublicHoliday: obs.isPublicHoliday
+  };
+});
+---
+
+<Layout 
+  title={t.directories.observancesTitle} 
+  description={t.directories.observancesMetaDesc}
+  lang={lang}
+>
+  <Header activeTab="observances" lang={lang} />
+
+  <main class="container main-content">
+    <section class="explorer-header">
+      <h1 class="page-title">{t.directories.observancesHeading}</h1>
+      <p class="page-intro">
+        {t.directories.observancesIntro}
+      </p>
+    </section>
+
+    <!-- Filter chips -->
+    <div class="filters-container">
+      <span class="filter-label">{t.common.filterLabel}</span>
+      <div class="filter-chips" role="tablist">
+        <button class="chip active" data-filter="all">{t.common.filterAll}</button>
+        <button class="chip" data-filter="festival">{t.common.filterFestivals}</button>
+        <button class="chip" data-filter="fast">{t.common.filterFasting}</button>
+        <button class="chip" data-filter="commemoration">{t.common.filterCommemorations}</button>
+        <button class="chip" data-filter="holiday">{t.common.filterHolidays}</button>
+      </div>
+    </div>
+
+    <!-- Observances list -->
+    <section class="observances-grid" id="observances-grid">
+      {observances.map(obs => (
+        <div class="observance-card-item" data-type={obs.type} data-holiday={obs.isPublicHoliday ? 'true' : 'false'}>
+          <ObservanceCard 
+            id={obs.id}
+            name={obs.name}
+            type={obs.type}
+            calendarName={obs.calendarName}
+            regionName={obs.regionName}
+            summary={obs.summary}
+            storyRef={obs.storyRef}
+            lang={lang}
+          />
+        </div>
+      ))}
+    </section>
+
+    <!-- Empty Filter State -->
+    <div id="no-filter-results" class="no-results-message" style="display: none;">
+      <p>{t.common.noFilterResults}</p>
+    </div>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<script>
+  function setupObservanceFilters() {
+    const chips = document.querySelectorAll<HTMLButtonElement>('.filter-chips .chip');
+    const cards = document.querySelectorAll<HTMLElement>('.observance-card-item');
+    const noResults = document.getElementById('no-filter-results');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const filter = chip.getAttribute('data-filter') || 'all';
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const type = card.getAttribute('data-type') || '';
+          const isHoliday = card.getAttribute('data-holiday') === 'true';
+
+          let matches = false;
+          if (filter === 'all') {
+            matches = true;
+          } else if (filter === 'festival') {
+            matches = type === 'festival' || type === 'holy_day';
+          } else if (filter === 'fast') {
+            matches = type === 'fast';
+          } else if (filter === 'commemoration') {
+            matches = type === 'commemoration' || type === 'international_day';
+          } else if (filter === 'holiday') {
+            matches = type === 'national_holiday' || isHoliday;
+          }
+
+          if (matches) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (noResults) {
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupObservanceFilters);
+  } else {
+    setupObservanceFilters();
+  }
+</script>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .explorer-header {
+    max-width: 800px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .page-intro {
+    font-size: 1.125rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  /* Filters styling */
+  .filters-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-md);
+  }
+
+  .filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-on-surface-variant);
+    letter-spacing: 0.05em;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .chip {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .chip:hover {
+    background-color: var(--color-surface-dim);
+    border-color: var(--color-outline-variant);
+  }
+
+  .chip.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-color: var(--color-primary);
+  }
+
+  /* Observances list grid */
+  .observances-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .observance-card-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .no-results-message {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--color-on-surface-variant);
+    font-size: 1rem;
+    background-color: var(--color-surface);
+    border: 1px dashed var(--color-outline);
+    border-radius: var(--radius-md);
+  }
+
+  @media (min-width: 768px) {
+    .observances-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

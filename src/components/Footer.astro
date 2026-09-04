@@ -1,23 +1,32 @@
 ---
+import type { Locale } from '../i18n/types';
+import { useTranslations, getLocalizedPath } from '../i18n/utils';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <footer class="footer">
   <div class="container footer-container">
     <div class="brand-group">
       <div class="brand">CheckYourCalendar</div>
-      <p class="tagline">Understanding what today means across calendars, cultures, and traditions.</p>
+      <p class="tagline">{t.footer.tagline}</p>
     </div>
     
     <nav class="footer-nav" aria-label="Footer Navigation">
-      <a href="/about" class="footer-link">About</a>
-      <a href="/about#methodology" class="footer-link">Methodology</a>
-      <a href="/privacy" class="footer-link">Privacy</a>
-      <a href="/terms" class="footer-link">Terms</a>
-      <a href="/contact" class="footer-link">Contact</a>
+      <a href={getLocalizedPath('/about', lang)} class="footer-link">{t.footer.about}</a>
+      <a href={getLocalizedPath('/about#methodology', lang)} class="footer-link">{t.footer.methodology}</a>
+      <a href={getLocalizedPath('/privacy', lang)} class="footer-link">{t.footer.privacy}</a>
+      <a href={getLocalizedPath('/terms', lang)} class="footer-link">{t.footer.terms}</a>
+      <a href={getLocalizedPath('/contact', lang)} class="footer-link">{t.footer.contact}</a>
     </nav>
     
     <div class="copyright">
-      &copy; {new Date().getFullYear()} CheckYourCalendar. All rights reserved.
+      &copy; {new Date().getFullYear()} CheckYourCalendar. {t.footer.rightsReserved}
     </div>
   </div>
 </footer>

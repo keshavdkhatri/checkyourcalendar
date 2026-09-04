@@ -1,4 +1,7 @@
 ---
+import type { Locale } from '../i18n/types';
+import { useTranslations, getLocalizedPath } from '../i18n/utils';
+
 interface CalendarConversion {
   name: string;
   dateString: string;
@@ -7,17 +10,16 @@ interface CalendarConversion {
 
 interface Props {
   conversions: CalendarConversion[];
+  lang?: Locale;
 }
 
-const { conversions } = Astro.props;
-
-// Separate the primary/large calendar item (Indian National Saka, for example) or keep all 5 balanced.
-// We can display the first 4 in a 2x2 grid, and the 5th spans full-width or fits beautifully.
+const { conversions, lang = 'en' } = Astro.props;
+const t = useTranslations(lang);
+const calendarsBase = getLocalizedPath('/calendars', lang);
 ---
 
 <div class="calendar-bento-grid">
   {conversions.map((conv, idx) => {
-    // If it's the last one and the total count is odd, make it span full-width.
     const isLastAndOdd = idx === conversions.length - 1 && conversions.length % 2 !== 0;
     return (
       <div class={`grid-item ${isLastAndOdd ? 'span-full' : ''}`}>
@@ -25,8 +27,8 @@ const { conversions } = Astro.props;
           <span class="calendar-name">{conv.name}</span>
         </div>
         <div class="converted-date">{conv.dateString}</div>
-        <a href={`/calendars#${conv.calendarId}`} class="explore-link" aria-label={`Learn how the ${conv.name} works`}>
-          How this calendar works &rarr;
+        <a href={`${calendarsBase}#${conv.calendarId}`} class="explore-link" aria-label={`Learn how ${conv.name} works`}>
+          {t.hero.howCalendarWorks}
         </a>
       </div>
     );

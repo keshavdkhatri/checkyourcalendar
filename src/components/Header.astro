@@ -1,57 +1,98 @@
 ---
+import type { Locale } from '../i18n/types';
+import { useTranslations, getLocalizedPath, LOCALES } from '../i18n/utils';
+
 interface Props {
   activeTab?: 'today' | 'calendars' | 'observances' | 'stories' | 'about' | 'search' | 'contact';
+  lang?: Locale;
 }
 
-const { activeTab } = Astro.props;
+const { activeTab, lang = 'en' } = Astro.props;
+const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
+
+const homeHref = getLocalizedPath('/', lang);
+const calendarsHref = getLocalizedPath('/calendars', lang);
+const observancesHref = getLocalizedPath('/observances', lang);
+const aboutHref = getLocalizedPath('/about', lang);
+const searchAction = getLocalizedPath('/search', lang);
+const contactHref = getLocalizedPath('/contact', lang);
 ---
 
 <header class="header">
   <div class="container header-container">
     <!-- Brand Logo -->
-    <a href="/" class="brand" aria-label="CheckYourCalendar home">
+    <a href={homeHref} class="brand" aria-label="CheckYourCalendar home">
       <span class="brand-text">CheckYourCalendar</span>
     </a>
 
     <!-- Desktop Navigation -->
     <nav class="nav-desktop" aria-label="Main Navigation">
-      <a href="/" class={`nav-link ${activeTab === 'today' ? 'active' : ''}`}>
-        Today
+      <a href={homeHref} class={`nav-link ${activeTab === 'today' ? 'active' : ''}`}>
+        {t.nav.today}
       </a>
-      <a href="/calendars" class={`nav-link ${activeTab === 'calendars' ? 'active' : ''}`}>
-        Calendars
+      <a href={calendarsHref} class={`nav-link ${activeTab === 'calendars' ? 'active' : ''}`}>
+        {t.nav.calendars}
       </a>
-      <a href="/observances" class={`nav-link ${activeTab === 'observances' ? 'active' : ''}`}>
-        Observances
+      <a href={observancesHref} class={`nav-link ${activeTab === 'observances' ? 'active' : ''}`}>
+        {t.nav.observances}
       </a>
-      <a href="/about" class={`nav-link ${activeTab === 'about' ? 'active' : ''}`}>
-        About
+      <a href={aboutHref} class={`nav-link ${activeTab === 'about' ? 'active' : ''}`}>
+        {t.nav.about}
       </a>
     </nav>
 
     <!-- Desktop Search (hidden on mobile/tablet, visible on desktop >= 1024px) -->
-    <form action="/search" method="GET" class="header-search-form desktop-search">
-      <label for="header-search-desktop" class="visually-hidden">Search dates, festivals, calendars...</label>
+    <form action={searchAction} method="GET" class="header-search-form desktop-search">
+      <label for="header-search-desktop" class="visually-hidden">{t.nav.searchPlaceholder}</label>
       <span class="material-symbols-outlined search-icon">search</span>
       <input 
         type="search" 
         id="header-search-desktop" 
         name="q" 
-        placeholder="Search dates, festivals, calendars..." 
+        placeholder={t.nav.searchPlaceholder} 
         class="header-search-input"
         required
       />
     </form>
 
-    <!-- Header Actions (Mobile & Tablet) -->
+    <!-- Language Selector & Mobile Action Buttons -->
     <div class="actions">
+      <!-- Desktop Language Switcher Pills -->
+      <nav class="lang-switcher-desktop" aria-label="Language Selector">
+        <a 
+          href={getLocalizedPath(currentPath, 'en')} 
+          class={`lang-btn ${lang === 'en' ? 'active' : ''}`}
+          aria-label="Switch to English"
+          hreflang="en"
+        >
+          EN
+        </a>
+        <a 
+          href={getLocalizedPath(currentPath, 'hi')} 
+          class={`lang-btn ${lang === 'hi' ? 'active' : ''}`}
+          aria-label="हिन्दी में देखें"
+          hreflang="hi"
+        >
+          हिन्दी
+        </a>
+        <a 
+          href={getLocalizedPath(currentPath, 'gu')} 
+          class={`lang-btn ${lang === 'gu' ? 'active' : ''}`}
+          aria-label="ગુજરાતીમાં જુઓ"
+          hreflang="gu"
+        >
+          ગુજરાતી
+        </a>
+      </nav>
+
       <!-- Mobile Search Toggle Button -->
-      <button class="action-btn mobile-search-toggle" aria-expanded="false" aria-controls="mobile-search-bar" aria-label="Toggle search bar">
+      <button class="action-btn mobile-search-toggle" aria-expanded="false" aria-controls="mobile-search-bar" aria-label={t.nav.toggleSearch}>
         <span class="material-symbols-outlined icon search-icon">search</span>
       </button>
       
       <!-- Mobile Menu Toggle Button -->
-      <button class="action-btn mobile-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle navigation menu">
+      <button class="action-btn mobile-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label={t.nav.toggleMenu}>
         <span class="material-symbols-outlined icon menu-icon">menu</span>
         <span class="material-symbols-outlined icon close-icon">close</span>
       </button>
@@ -61,18 +102,18 @@ const { activeTab } = Astro.props;
   <!-- Mobile Search Bar (Toggled on mobile/tablet) -->
   <div id="mobile-search-bar" class="mobile-search-container" hidden>
     <div class="container">
-      <form action="/search" method="GET" class="header-search-form mobile-search-form">
-        <label for="header-search-mobile" class="visually-hidden">Search dates, festivals, calendars...</label>
+      <form action={searchAction} method="GET" class="header-search-form mobile-search-form">
+        <label for="header-search-mobile" class="visually-hidden">{t.nav.searchPlaceholder}</label>
         <span class="material-symbols-outlined search-icon">search</span>
         <input 
           type="search" 
           id="header-search-mobile" 
           name="q" 
-          placeholder="Search dates, festivals, calendars..." 
+          placeholder={t.nav.searchPlaceholder} 
           class="header-search-input"
           required
         />
-        <button type="submit" class="mobile-search-submit">Search</button>
+        <button type="submit" class="mobile-search-submit">{t.search.submit}</button>
       </form>
     </div>
   </div>
@@ -80,41 +121,69 @@ const { activeTab } = Astro.props;
   <!-- Mobile Navigation Panel -->
   <nav id="mobile-nav" class="nav-mobile" aria-label="Mobile Navigation" hidden>
     <div class="mobile-nav-inner container">
+      <!-- Mobile Language Switcher Group -->
       <div class="mobile-nav-group">
-        <span class="mobile-group-label">Explore</span>
+        <span class="mobile-group-label">Language / ભાષા / भाषा</span>
+        <div class="mobile-lang-switcher">
+          <a 
+            href={getLocalizedPath(currentPath, 'en')} 
+            class={`mobile-lang-btn ${lang === 'en' ? 'active' : ''}`}
+            hreflang="en"
+          >
+            English
+          </a>
+          <a 
+            href={getLocalizedPath(currentPath, 'hi')} 
+            class={`mobile-lang-btn ${lang === 'hi' ? 'active' : ''}`}
+            hreflang="hi"
+          >
+            हिन्दी
+          </a>
+          <a 
+            href={getLocalizedPath(currentPath, 'gu')} 
+            class={`mobile-lang-btn ${lang === 'gu' ? 'active' : ''}`}
+            hreflang="gu"
+          >
+            ગુજરાતી
+          </a>
+        </div>
+      </div>
+
+      <div class="mobile-nav-group">
+        <span class="mobile-group-label">{t.nav.explore}</span>
         <div class="mobile-links-list">
-          <a href="/" class={`mobile-nav-item ${activeTab === 'today' ? 'active' : ''}`}>
+          <a href={homeHref} class={`mobile-nav-item ${activeTab === 'today' ? 'active' : ''}`}>
             <span class="material-symbols-outlined nav-item-icon">today</span>
             <div class="nav-item-content">
-              <span class="nav-item-title">Today</span>
-              <span class="nav-item-desc">Current date & 8 calendar conversions</span>
+              <span class="nav-item-title">{t.nav.today}</span>
+              <span class="nav-item-desc">{t.nav.todayDesc}</span>
             </div>
             <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
           </a>
 
-          <a href="/calendars" class={`mobile-nav-item ${activeTab === 'calendars' ? 'active' : ''}`}>
+          <a href={calendarsHref} class={`mobile-nav-item ${activeTab === 'calendars' ? 'active' : ''}`}>
             <span class="material-symbols-outlined nav-item-icon">calendar_month</span>
             <div class="nav-item-content">
-              <span class="nav-item-title">Calendars</span>
-              <span class="nav-item-desc">8 global timekeeping traditions</span>
+              <span class="nav-item-title">{t.nav.calendars}</span>
+              <span class="nav-item-desc">{t.nav.calendarsDesc}</span>
             </div>
             <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
           </a>
 
-          <a href="/observances" class={`mobile-nav-item ${activeTab === 'observances' ? 'active' : ''}`}>
+          <a href={observancesHref} class={`mobile-nav-item ${activeTab === 'observances' ? 'active' : ''}`}>
             <span class="material-symbols-outlined nav-item-icon">celebration</span>
             <div class="nav-item-content">
-              <span class="nav-item-title">Observances</span>
-              <span class="nav-item-desc">Festivals, fasts & cultural holidays</span>
+              <span class="nav-item-title">{t.nav.observances}</span>
+              <span class="nav-item-desc">{t.nav.observancesDesc}</span>
             </div>
             <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
           </a>
 
-          <a href="/about" class={`mobile-nav-item ${activeTab === 'about' ? 'active' : ''}`}>
+          <a href={aboutHref} class={`mobile-nav-item ${activeTab === 'about' ? 'active' : ''}`}>
             <span class="material-symbols-outlined nav-item-icon">info</span>
             <div class="nav-item-content">
-              <span class="nav-item-title">About</span>
-              <span class="nav-item-desc">Methodology, FAQ & calculation science</span>
+              <span class="nav-item-title">{t.nav.about}</span>
+              <span class="nav-item-desc">{t.nav.aboutDesc}</span>
             </div>
             <span class="material-symbols-outlined nav-item-arrow">chevron_right</span>
           </a>
@@ -123,13 +192,13 @@ const { activeTab } = Astro.props;
 
       <!-- Quick Shortcuts in Mobile Nav Footer -->
       <div class="mobile-nav-footer">
-        <a href="/search" class={`mobile-footer-link ${activeTab === 'search' ? 'active' : ''}`}>
+        <a href={searchAction} class={`mobile-footer-link ${activeTab === 'search' ? 'active' : ''}`}>
           <span class="material-symbols-outlined icon">manage_search</span>
-          <span>Search Directory</span>
+          <span>{t.nav.searchDir}</span>
         </a>
-        <a href="/contact" class={`mobile-footer-link ${activeTab === 'contact' ? 'active' : ''}`}>
+        <a href={contactHref} class={`mobile-footer-link ${activeTab === 'contact' ? 'active' : ''}`}>
           <span class="material-symbols-outlined icon">mail</span>
-          <span>Contact & Feedback</span>
+          <span>{t.nav.contactFeedback}</span>
         </a>
       </div>
     </div>
@@ -253,7 +322,64 @@ const { activeTab } = Astro.props;
   .actions {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+  }
+
+  /* Desktop Language Switcher */
+  .lang-switcher-desktop {
+    display: none;
+    align-items: center;
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-full);
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .lang-btn {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .lang-btn:hover {
+    color: var(--color-primary);
+  }
+
+  .lang-btn.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  /* Mobile Language Switcher */
+  .mobile-lang-switcher {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-xs);
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: 4px;
+  }
+
+  .mobile-lang-btn {
+    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-on-surface-variant);
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .mobile-lang-btn.active {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
   }
 
   /* Visually Hidden utility for a11y labels */
@@ -307,11 +433,11 @@ const { activeTab } = Astro.props;
   /* Desktop search specific */
   .desktop-search {
     display: none;
-    max-width: 280px;
-    margin: 0 var(--spacing-md);
+    max-width: 240px;
+    margin: 0 var(--spacing-xs);
   }
 
-  /* Shared Action Button Styling (Lighter, Integrated 44px Touch Targets) */
+  /* Shared Action Button Styling */
   .action-btn {
     display: flex;
     align-items: center;
@@ -506,7 +632,7 @@ const { activeTab } = Astro.props;
     transform: translateX(2px);
   }
 
-  /* Refined Editorial Active State */
+  /* Active State */
   .mobile-nav-item.active {
     background-color: var(--color-surface-container-low);
     border-color: var(--color-primary);
@@ -596,6 +722,10 @@ const { activeTab } = Astro.props;
     }
 
     .nav-desktop {
+      display: flex;
+    }
+
+    .lang-switcher-desktop {
       display: flex;
     }
 

@@ -1,0 +1,290 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { useTranslations } from '../../i18n/utils';
+import type { Locale } from '../../i18n/types';
+
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'hi' } },
+    { params: { lang: 'gu' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = useTranslations(lang);
+
+const labels = {
+  hi: {
+    title: 'संपर्क करें',
+    intro: 'क्या आपके पास कोई सुझाव है, कोई विसंगति देखी है, या कोई सांस्कृतिक पर्व जोड़ना चाहते हैं? नीचे दिए गए फॉर्म का उपयोग करें।',
+    name: 'नाम',
+    email: 'ईमेल पता',
+    subject: 'विषय',
+    selectSubject: 'विषय चुनें...',
+    topicCorrection: 'कैलेंडर विसंगति / सुधार',
+    topicSuggestion: 'पर्व / त्योहार का सुझाव',
+    topicFeedback: 'सामान्य प्रतिक्रिया',
+    topicOther: 'अन्य पूछताछ',
+    message: 'संदेश',
+    send: 'संदेश भेजें',
+    sidebarTitle: 'कैलेंडर डेटा संबंधी महत्वपूर्ण टिप्पणी',
+    sidebarText: 'कैलेंडर नियम खगोलीय चक्रों और विभिन्न परंपराओं पर आधारित होते हैं। सुधार का सुझाव देते समय कृपया शामिल करें:',
+    sidebarItem1: 'संबंधित कैलेंडर प्रणाली',
+    sidebarItem2: 'तिथि और अपेक्षित पर्व',
+    sidebarItem3: 'प्रमाणित स्रोत या पंचांग संदर्भ',
+    directContact: 'सीधा संपर्क',
+    directText: 'सामान्य पूछताछ के लिए संपर्क करें:'
+  },
+  gu: {
+    title: 'સંપર્ક કરો',
+    intro: 'શું આપની પાસે કોઈ પ્રતિસાદ છે, કેલેન્ડરમાં કોઈ ક્ષતિ જણાઈ છે, કે કોઈ તહેવાર ઉમેરવા માંગો છો? નીચે આપેલા ફોર્મ દ્વારા અમારો સંપર્ક કરો.',
+    name: 'નામ',
+    email: 'ઈમેલ સરનામું',
+    subject: 'વિષય',
+    selectSubject: 'વિષય પસંદ કરો...',
+    topicCorrection: 'કેલેન્ડર ક્ષતિ / સુધારો',
+    topicSuggestion: 'તહેવાર / વ્રતનું સૂચન',
+    topicFeedback: 'સામાન્ય પ્રતિભાવ',
+    topicOther: 'અન્ય પૂછપરછ',
+    message: 'સંદેશ',
+    send: 'સંદેશ મોકલો',
+    sidebarTitle: 'કેલેન્ડર માહિતી અંગે મહત્વપૂર્ણ નોંધ',
+    sidebarText: 'સમયગણનાના નિયમો ખગોળીય ચક્રો અને વિવિધ પરંપરાઓ પર આધારિત હોય છે. સુધારો સૂચવતી વખતે કૃપા કરીને વિગતો આપો:',
+    sidebarItem1: 'સંબંધિત કેલેન્ડર પ્રણાલી',
+    sidebarItem2: 'તારીખ અને અપેક્ષિત તહેવાર',
+    sidebarItem3: 'પ્રમાણિત સ્ત્રોત અથવા પંચાંગ સંદર્ભ',
+    directContact: 'સીધો સંપર્ક',
+    directText: 'સામાન્ય પૂછપરછ માટે સંપર્ક કરો:'
+  }
+}[lang];
+---
+
+<Layout 
+  title={t.contact.title} 
+  description={t.contact.metaDesc}
+  lang={lang}
+>
+  <Header activeTab="contact" lang={lang} />
+
+  <main class="container main-content">
+    <section class="contact-section">
+      <div class="contact-header">
+        <h1 class="page-title">{labels.title}</h1>
+        <p class="page-intro">
+          {labels.intro}
+        </p>
+      </div>
+
+      <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="form-container">
+          <form class="contact-form" action="#" method="POST">
+            <div class="form-group">
+              <label for="name" class="form-label">{labels.name}</label>
+              <input type="text" id="name" name="name" class="form-input" required autocomplete="name" />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">{labels.email}</label>
+              <input type="email" id="email" name="email" class="form-input" required autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+              <label for="subject" class="form-label">{labels.subject}</label>
+              <select id="subject" name="subject" class="form-select" required>
+                <option value="" disabled selected>{labels.selectSubject}</option>
+                <option value="correction">{labels.topicCorrection}</option>
+                <option value="suggestion">{labels.topicSuggestion}</option>
+                <option value="feedback">{labels.topicFeedback}</option>
+                <option value="other">{labels.topicOther}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">{labels.message}</label>
+              <textarea id="message" name="message" class="form-textarea" rows="6" required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">{labels.send}</button>
+          </form>
+        </div>
+
+        <!-- Info Sidebar -->
+        <aside class="info-sidebar">
+          <div class="info-card">
+            <h2 class="sidebar-title">{labels.sidebarTitle}</h2>
+            <p class="sidebar-text">
+              {labels.sidebarText}
+            </p>
+            <ul class="sidebar-list">
+              <li>{labels.sidebarItem1}</li>
+              <li>{labels.sidebarItem2}</li>
+              <li>{labels.sidebarItem3}</li>
+            </ul>
+          </div>
+          
+          <div class="info-card border-only">
+            <h2 class="sidebar-title">{labels.directContact}</h2>
+            <p class="sidebar-text">
+              {labels.directText}
+              <br />
+              <strong>inquiries@checkyourcalendar.com</strong>
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .contact-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .contact-header {
+    max-width: 800px;
+  }
+
+  .page-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .page-intro {
+    font-size: 1.125rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.6;
+  }
+
+  /* Grid Layout */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+  }
+
+  .form-container {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .form-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-on-surface-variant);
+    letter-spacing: 0.05em;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background-color: var(--color-surface-dim);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    width: 100%;
+    outline: none;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface);
+  }
+
+  .submit-btn {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .submit-btn:hover {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  /* Sidebar styling */
+  .info-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .info-card {
+    background-color: var(--color-surface-container-low);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+  }
+
+  .info-card.border-only {
+    background-color: transparent;
+    border: 1px dashed var(--color-outline-variant);
+  }
+
+  .sidebar-title {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .sidebar-text {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .sidebar-list {
+    margin-top: var(--spacing-sm);
+    padding-left: var(--spacing-md);
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  @media (min-width: 992px) {
+    .contact-grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+</style>

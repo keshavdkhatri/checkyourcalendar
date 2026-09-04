@@ -1,26 +1,34 @@
 ---
+import type { Locale } from '../i18n/types';
+import { getHreflangLinks } from '../i18n/utils';
+
 interface Props {
   title: string;
   description?: string;
   canonicalUrl?: string;
   type?: 'website' | 'article';
+  lang?: Locale;
 }
 
 const { 
   title, 
   description = "Check your calendar — and understand what today means across calendars, cultures, and traditions.", 
   canonicalUrl,
-  type = 'website'
+  type = 'website',
+  lang = 'en'
 } = Astro.props;
 
 const resolvedCanonical = canonicalUrl || Astro.url.href;
+const hreflangLinks = getHreflangLinks(Astro.url);
+const ogLocale = lang === 'hi' ? 'hi_IN' : lang === 'gu' ? 'gu_IN' : 'en_US';
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={lang} translate={lang !== 'en' ? 'no' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {lang !== 'en' && <meta name="google" content="notranslate" />}
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RQMWRGL10V"></script>
@@ -43,10 +51,19 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     <meta name="description" content={description} />
     <link rel="canonical" href={resolvedCanonical} />
     
+    <!-- Multilingual Hreflang Tags -->
+    {hreflangLinks.map(h => (
+      <link rel="alternate" hreflang={h.lang} href={h.href} />
+    ))}
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content="CheckYourCalendar" />
-    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:locale" content={ogLocale} />
+    {lang !== 'en' && <meta property="og:locale:alternate" content="en_US" />}
+    {lang !== 'hi' && <meta property="og:locale:alternate" content="hi_IN" />}
+    {lang !== 'gu' && <meta property="og:locale:alternate" content="gu_IN" />}
+    <meta property="og:url" content={resolvedCanonical} />
     <meta property="og:title" content={`${title} | CheckYourCalendar`} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content="https://checkyourcalendar.com/og-card.png" />
@@ -56,7 +73,7 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content={Astro.url.href} />
+    <meta name="twitter:url" content={resolvedCanonical} />
     <meta name="twitter:title" content={`${title} | CheckYourCalendar`} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content="https://checkyourcalendar.com/og-card.png" />
@@ -216,5 +233,12 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     display: inline-block;
     vertical-align: middle;
     line-height: 1;
+  }
+
+  /* Prevent underlines on icon ligatures and glyphs inside interactive links */
+  a .material-symbols-outlined,
+  a .icon {
+    display: inline-block;
+    text-decoration: none !important;
   }
 </style>

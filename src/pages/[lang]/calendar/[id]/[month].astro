@@ -1,34 +1,57 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Header from '../../../components/Header.astro';
-import Footer from '../../../components/Footer.astro';
-import { CalendarRegistry } from '../../../engines/calendar/registry';
-import { ObservanceEngine } from '../../../engines/observance/engine';
+import Layout from '../../../../layouts/Layout.astro';
+import Header from '../../../../components/Header.astro';
+import Footer from '../../../../components/Footer.astro';
+import { CalendarRegistry } from '../../../../engines/calendar/registry';
+import { ObservanceEngine } from '../../../../engines/observance/engine';
+import { useTranslations } from '../../../../i18n/utils';
+import { getLocalizedCalendarInfo, formatLocalizedCalendarDate, toIndicDigits } from '../../../../i18n/calendarTranslations';
+import { getLocalizedObservance } from '../../../../i18n/observanceTranslations';
+import type { Locale } from '../../../../i18n/types';
 
 export async function getStaticPaths() {
   const adapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian');
-  return adapters.map(adapter => ({
-    params: { id: adapter.id },
-  }));
+  const months = [
+    '2026-01', '2026-02', '2026-03', '2026-04',
+    '2026-05', '2026-06', '2026-07', '2026-08',
+    '2026-09', '2026-10', '2026-11', '2026-12'
+  ];
+  const locales: Locale[] = ['hi', 'gu'];
+
+  const paths = [];
+  for (const lang of locales) {
+    for (const adapter of adapters) {
+      for (const month of months) {
+        paths.push({
+          params: { lang, id: adapter.id, month },
+        });
+      }
+    }
+  }
+  return paths;
 }
 
-const { id } = Astro.params;
+const { lang, id, month } = Astro.params as { lang: Locale; id: string; month: string };
 const adapter = CalendarRegistry.getAdapter(id || '');
 
-if (!adapter) {
-  return Astro.redirect('/404');
+if (!adapter || !month) {
+  return Astro.redirect(`/${lang}/404`);
 }
 
-// Default to September 2026 for the initial calendar overview
-const month = '2026-09';
-const year = 2026;
-const monthNum = 9;
+const [yearStr, monthStr] = month.split('-');
+const year = parseInt(yearStr, 10);
+const monthNum = parseInt(monthStr, 10);
 
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-const gregorianMonthName = monthNames[monthNum - 1];
+if (isNaN(year) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+  return Astro.redirect(`/${lang}/404`);
+}
+
+const t = useTranslations(lang);
+const info = getLocalizedCalendarInfo(adapter.id);
+const calName = info ? info.name[lang] : adapter.name;
+
+const localeTag = lang === 'hi' ? 'hi-IN' : 'gu-IN';
+const gregorianMonthName = new Intl.DateTimeFormat(localeTag, { month: 'long' }).format(new Date(year, monthNum - 1, 1));
 const daysInMonth = new Date(year, monthNum, 0).getDate();
 
 // Generate day conversions for this specific calendar
@@ -38,15 +61,25 @@ for (let d = 1; d <= daysInMonth; d++) {
   const jsDate = new Date(year, monthNum - 1, d);
   const dayOfWeek = jsDate.getDay();
   const converted = adapter.fromGregorian(dateObj);
-  const formatted = adapter.format(converted);
-  const observances = ObservanceEngine.getObservancesForDate(dateObj, adapter.id);
+  const formatted = formatLocalizedCalendarDate(converted, lang);
+  const matchedObservances = ObservanceEngine.getObservancesForDate(dateObj, adapter.id);
+  const observances = matchedObservances.map(obs => {
+    const locObs = getLocalizedObservance(obs.id, lang);
+    return {
+      id: obs.id,
+      name: locObs ? locObs.name : obs.name
+    };
+  });
   const dateKey = `${year}-${String(monthNum).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const weekdayShort = new Intl.DateTimeFormat(localeTag, { weekday: 'short' }).format(jsDate);
+  const weekdayLong = new Intl.DateTimeFormat(localeTag, { weekday: 'long' }).format(jsDate);
 
   days.push({
     dayNum: d,
+    dayDisplay: toIndicDigits(d, lang),
     dayOfWeek,
-    weekdayShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayOfWeek],
-    weekdayLong: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek],
+    weekdayShort,
+    weekdayLong,
     dateKey,
     converted,
     formatted,
@@ -58,31 +91,85 @@ for (let d = 1; d <= daysInMonth; d++) {
 const firstDayConv = days[0].converted;
 const lastDayConv = days[days.length - 1].converted;
 let primaryMonthTitle = '';
-if (firstDayConv.monthName === lastDayConv.monthName) {
-  primaryMonthTitle = `${firstDayConv.monthName} ${firstDayConv.year} ${firstDayConv.era || ''}`.trim();
+
+const vikramMonthsMap: Record<number, { en: string; hi: string; gu: string }> = {
+  1: { en: 'Kartak', hi: 'कार्तिक', gu: 'કાર્તક' },
+  2: { en: 'Magsar', hi: 'मार्गशीर्ष', gu: 'માગશર' },
+  3: { en: 'Pos', hi: 'पौष', gu: 'પોષ' },
+  4: { en: 'Maha', hi: 'माघ', gu: 'મહા' },
+  5: { en: 'Fagun', hi: 'फाल्गुन', gu: 'ફાગણ' },
+  6: { en: 'Chaitra', hi: 'चैत्र', gu: 'ચૈત્ર' },
+  7: { en: 'Vaishakh', hi: 'वैशाख', gu: 'વૈશાખ' },
+  8: { en: 'Jeth', hi: 'ज्येष्ठ', gu: 'જેઠ' },
+  9: { en: 'Ashadh', hi: 'आषाढ़', gu: 'અષાઢ' },
+  10: { en: 'Shravan', hi: 'श्रावण', gu: 'શ્રાવણ' },
+  11: { en: 'Bhadarvo', hi: 'भाद्रपद', gu: 'ભાદરવો' },
+  12: { en: 'Aaso', hi: 'आश्विन', gu: 'આસો' },
+};
+
+if (adapter.id === 'hindu-vikram') {
+  const m1 = (vikramMonthsMap[firstDayConv.month] || {})[lang] || firstDayConv.monthName;
+  const m2 = (vikramMonthsMap[lastDayConv.month] || {})[lang] || lastDayConv.monthName;
+  const eraLabel = lang === 'gu' ? 'વિ.સં.' : 'वि.सं.';
+  if (firstDayConv.month === lastDayConv.month) {
+    primaryMonthTitle = `${m1} ${toIndicDigits(firstDayConv.year, lang)} ${eraLabel}`;
+  } else {
+    primaryMonthTitle = `${m1} – ${m2} ${toIndicDigits(lastDayConv.year, lang)} ${eraLabel}`;
+  }
 } else {
-  primaryMonthTitle = `${firstDayConv.monthName} – ${lastDayConv.monthName} ${lastDayConv.year} ${lastDayConv.era || ''}`.trim();
+  const m1 = firstDayConv.monthName || '';
+  const m2 = lastDayConv.monthName || '';
+  const yStr = toIndicDigits(lastDayConv.year, lang);
+  let eraSuffix = '';
+  if (adapter.id === 'islamic-civil') eraSuffix = lang === 'gu' ? ' હિજરી' : ' हिजरी';
+  else if (adapter.id === 'hebrew') eraSuffix = lang === 'gu' ? ' હિબ્રૂ વર્ષ' : ' हिब्रू वर्ष';
+  else if (adapter.id === 'persian') eraSuffix = lang === 'gu' ? ' સૌર હિજરી' : ' सौर हिजरी';
+  else if (adapter.id === 'indian-saka') eraSuffix = lang === 'gu' ? ' શક સંવત' : ' शक संवत';
+  else if (adapter.id === 'coptic') eraSuffix = lang === 'gu' ? ' એ.એમ.' : ' ए.एम.';
+  else if (adapter.id === 'ethiopic') eraSuffix = lang === 'gu' ? ' ઈ.સી.' : ' ई.સી.';
+
+  if (m1 === m2) {
+    primaryMonthTitle = `${m1} ${yStr}${eraSuffix}`.trim();
+  } else {
+    primaryMonthTitle = `${m1} – ${m2} ${yStr}${eraSuffix}`.trim();
+  }
 }
 
 // Month Navigation
-const prevMonthStr = '2026-08';
-const nextMonthStr = '2026-10';
-const prevMonthName = 'August';
-const nextMonthName = 'October';
+const prevMonthStr = monthNum > 1 ? `2026-${String(monthNum - 1).padStart(2, '0')}` : null;
+const nextMonthStr = monthNum < 12 ? `2026-${String(monthNum + 1).padStart(2, '0')}` : null;
+const prevMonthName = monthNum > 1 ? new Intl.DateTimeFormat(localeTag, { month: 'long' }).format(new Date(2026, monthNum - 2, 1)) : null;
+const nextMonthName = monthNum < 12 ? new Intl.DateTimeFormat(localeTag, { month: 'long' }).format(new Date(2026, monthNum, 1)) : null;
 
 // Available calendars for quick switching
-const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian');
+const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'gregorian').map(ad => {
+  const adInfo = getLocalizedCalendarInfo(ad.id);
+  return {
+    id: ad.id,
+    name: adInfo ? adInfo.name[lang] : ad.name
+  };
+});
+
+const pageTitle = `${calName} - ${gregorianMonthName} ${toIndicDigits(year, lang)}`;
+const pageDesc = lang === 'hi'
+  ? `${calName} के लिए दैनिक तिथि रूपांतरण, पंचांग विवरण और सांस्कृतिक पर्व (${gregorianMonthName} ${toIndicDigits(year, lang)})।`
+  : `${calName} માટે દૈનિક તારીખ રૂપાંતરણ, પંચાંગ વિગતો અને તહેવારો (${gregorianMonthName} ${toIndicDigits(year, lang)}).`;
 ---
 
-<Layout title={`${adapter.name} - ${gregorianMonthName} ${year}`} description={`Explore daily date conversions, calendar alignments, and cultural observances for ${adapter.name} corresponding to ${gregorianMonthName} ${year}.`}>
-  <Header activeTab="calendars" />
+<Layout 
+  title={pageTitle} 
+  description={pageDesc}
+  lang={lang}
+>
+  <Header activeTab="calendars" lang={lang} />
 
   <!-- Breadcrumbs -->
   <nav class="container breadcrumbs" aria-label="Breadcrumb">
     <ol class="breadcrumb-list">
-      <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href="/calendars">Calendars</a></li>
-      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>{adapter.name}</li>
+      <li class="breadcrumb-item"><a href={`/${lang}`}>{t.common.breadcrumbsHome}</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href={`/${lang}/calendars`}>{t.nav.calendars}</a></li>
+      <li class="breadcrumb-item"><span class="material-symbols-outlined separator">chevron_right</span><a href={`/${lang}/calendar/${adapter.id}`}>{calName}</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="material-symbols-outlined separator">chevron_right</span>{gregorianMonthName} {toIndicDigits(year, lang)}</li>
     </ol>
   </nav>
 
@@ -90,34 +177,50 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
     <!-- Month Header & Summary -->
     <section class="month-header-card">
       <div class="header-left">
-        <span class="calendar-badge">{adapter.name}</span>
+        <span class="calendar-badge">{calName}</span>
         <h1 class="month-title">{primaryMonthTitle}</h1>
-        <p class="gregorian-range">Corresponding to {gregorianMonthName} 1 – {gregorianMonthName} {daysInMonth}, {year} (Gregorian)</p>
+        <p class="gregorian-range">
+          {t.common.correspondingTo} {gregorianMonthName} {toIndicDigits(1, lang)} – {gregorianMonthName} {toIndicDigits(daysInMonth, lang)}, {toIndicDigits(year, lang)}
+        </p>
       </div>
 
       <!-- Navigation buttons -->
       <div class="month-nav">
-        <a href={`/calendar/${adapter.id}/${prevMonthStr}`} class="nav-btn prev-btn" title={`Go to ${prevMonthName} 2026`}>
-          <span class="material-symbols-outlined icon">arrow_back</span>
-          <span>{prevMonthName}</span>
-        </a>
+        {prevMonthStr ? (
+          <a href={`/${lang}/calendar/${adapter.id}/${prevMonthStr}`} class="nav-btn prev-btn" title={prevMonthName || ''}>
+            <span class="material-symbols-outlined icon">arrow_back</span>
+            <span>{prevMonthName}</span>
+          </a>
+        ) : (
+          <span class="nav-btn disabled">
+            <span class="material-symbols-outlined icon">arrow_back</span>
+            <span>{t.common.start}</span>
+          </span>
+        )}
 
-        <span class="current-month-label">{gregorianMonthName} {year}</span>
+        <span class="current-month-label">{gregorianMonthName} {toIndicDigits(year, lang)}</span>
 
-        <a href={`/calendar/${adapter.id}/${nextMonthStr}`} class="nav-btn next-btn" title={`Go to ${nextMonthName} 2026`}>
-          <span>{nextMonthName}</span>
-          <span class="material-symbols-outlined icon">arrow_forward</span>
-        </a>
+        {nextMonthStr ? (
+          <a href={`/${lang}/calendar/${adapter.id}/${nextMonthStr}`} class="nav-btn next-btn" title={nextMonthName || ''}>
+            <span>{nextMonthName}</span>
+            <span class="material-symbols-outlined icon">arrow_forward</span>
+          </a>
+        ) : (
+          <span class="nav-btn disabled">
+            <span>{t.common.end}</span>
+            <span class="material-symbols-outlined icon">arrow_forward</span>
+          </span>
+        )}
       </div>
     </section>
 
     <!-- Calendar System Switcher Pills -->
     <section class="calendar-switcher">
-      <span class="switcher-label">View another calendar for {gregorianMonthName} {year}:</span>
+      <span class="switcher-label">{t.common.viewAnotherCalendar} {gregorianMonthName} {toIndicDigits(year, lang)}:</span>
       <div class="switcher-pills">
         {allAdapters.map(ad => (
           <a 
-            href={`/calendar/${ad.id}/${month}`} 
+            href={`/${lang}/calendar/${ad.id}/${month}`} 
             class={`pill ${ad.id === adapter.id ? 'active' : ''}`}
           >
             {ad.name}
@@ -128,7 +231,7 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
 
     <!-- Monthly Date Cards Grid -->
     <section class="month-grid-section">
-      <h2 class="section-heading">Daily Date Conversions & Observances</h2>
+      <h2 class="section-heading">{t.common.dailyConversions}</h2>
       
       <div class="days-list-grid">
         {days.map(d => {
@@ -139,28 +242,28 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
             <article class={`day-card ${isWeekend ? 'weekend' : ''} ${hasObservances ? 'has-observance' : ''}`}>
               <div class="day-card-header">
                 <div class="gregorian-date-badge">
-                  <span class="day-number">{d.dayNum}</span>
+                  <span class="day-number">{d.dayDisplay}</span>
                   <span class="day-weekday">{d.weekdayShort}</span>
                 </div>
                 
-                <a href={`/date/${d.dateKey}`} class="day-detail-link" title={`View multi-calendar details for ${d.dateKey}`}>
-                  <span>All Calendars</span>
+                <a href={`/${lang}/date/${d.dateKey}`} class="day-detail-link" title={`/${lang}/date/${d.dateKey}`}>
+                  <span>{t.common.allCalendars}</span>
                   <span class="material-symbols-outlined icon">north_east</span>
                 </a>
               </div>
 
               <div class="converted-info">
-                <span class="converted-label">{adapter.name}</span>
+                <span class="converted-label">{calName}</span>
                 <p class="converted-date-str">{d.formatted}</p>
               </div>
 
               {hasObservances && (
                 <div class="observances-section">
-                  <span class="obs-header">Observances:</span>
+                  <span class="obs-header">{t.nav.observances}:</span>
                   <div class="obs-tags">
                     {d.observances.map(obs => (
                       <div class="obs-tag-item">
-                        <a href={`/observance/${obs.id}`} class="obs-name-link">
+                        <a href={`/${lang}/observance/${obs.id}`} class="obs-name-link">
                           <span class="material-symbols-outlined obs-icon">event_note</span>
                           <span>{obs.name}</span>
                         </a>
@@ -176,7 +279,7 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
     </section>
   </main>
 
-  <Footer />
+  <Footer lang={lang} />
 </Layout>
 
 <style>
@@ -296,13 +399,18 @@ const allAdapters = CalendarRegistry.getActiveAdapters().filter(a => a.id !== 'g
     transition: background-color 0.2s ease;
   }
 
-  .nav-btn:hover {
+  .nav-btn:hover:not(.disabled) {
     background-color: var(--color-surface);
     text-decoration: none;
   }
 
-  .nav-btn:hover span:not(.icon) {
+  .nav-btn:hover:not(.disabled) span:not(.icon) {
     text-decoration: underline;
+  }
+
+  .nav-btn.disabled {
+    color: var(--color-outline);
+    cursor: not-allowed;
   }
 
   .nav-btn .icon {

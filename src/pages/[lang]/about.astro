@@ -1,0 +1,353 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { useTranslations } from '../../i18n/utils';
+import type { Locale } from '../../i18n/types';
+
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'hi' } },
+    { params: { lang: 'gu' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = useTranslations(lang);
+---
+
+<Layout 
+  title={t.about.title} 
+  description={t.about.metaDesc}
+  lang={lang}
+>
+  <Header activeTab="about" lang={lang} />
+
+  <main class="container main-content">
+    <article class="editorial-article">
+      <header class="article-header">
+        <h1 class="article-title">{lang === 'hi' ? 'CheckYourCalendar के बारे में' : 'CheckYourCalendar વિશે'}</h1>
+        <p class="article-subtitle">
+          {lang === 'hi' ? 'खगोलीय काल-गणना और सांस्कृतिक गाथाओं का सेतु' : 'ખગોળીય ગણતરીઓ અને સાંસ્કૃતિક વારસાનો સમન્વય'}
+        </p>
+      </header>
+
+      <section class="article-body">
+        <p class="lead">
+          {lang === 'hi' 
+            ? 'समय केवल एक संख्या नहीं है। प्रत्येक दिन का एक संदर्भ होता है और प्रत्येक तिथि का अपना इतिहास होता है। CheckYourCalendar का उद्देश्य आधुनिक समय-गणना और विभिन्न सांस्कृतिक परंपराओं के बीच एक सुदृढ़ सेतु बनाना है।'
+            : 'સમય માત્ર એક અંક નથી. દરેક દિવસનો એક વિશેષ સંદર્ભ હોય છે અને દરેક તારીખનો પોતાનો ઇતિહાસ હોય છે. CheckYourCalendar નો હેતુ આધુનિક કેલેન્ડર ગણતરીઓ અને વિવિધ સંસ્કૃતિઓની સમૃદ્ધ પરંપરાઓ વચ્ચે સુમેળ સાધવાનો છે.'
+          }
+        </p>
+
+        <h2>{lang === 'hi' ? 'हमारा उद्देश्य: तिथि अन्वेषण यात्रा' : 'અમારો ઉદ્દેશ્ય: તારીખ સંશોધન યાત્રા'}</h2>
+        <p>
+          {lang === 'hi' 
+            ? 'हमारी सूचना संरचना चार स्पष्ट चरणों पर आधारित है:' 
+            : 'અમારી માહિતી પ્રણાલી ચાર મહત્વપૂર્ણ તબક્કાઓ પર આધારિત છે:'}
+        </p>
+        <div class="mission-path">
+          <div class="path-step">
+            <span class="step-num">1</span>
+            <strong>{lang === 'hi' ? 'तारीख' : 'તારીખ'}</strong>
+            <p>{lang === 'hi' ? 'समय का एक विशिष्ट निर्देशांक' : 'સમયનો ચોક્કસ નિર્દેશાંક'}</p>
+          </div>
+          <div class="path-arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+          <div class="path-step">
+            <span class="step-num">2</span>
+            <strong>{lang === 'hi' ? 'कैलेंडर' : 'કેલેન્ડર'}</strong>
+            <p>{lang === 'hi' ? 'विभिन्न संस्कृतियों में तिथि का रूप' : 'વિવિધ સંસ્કૃતિઓમાં તારીખનું સ્વરૂપ'}</p>
+          </div>
+          <div class="path-arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+          <div class="path-step">
+            <span class="step-num">3</span>
+            <strong>{lang === 'hi' ? 'पर्व व त्योहार' : 'તહેવારો અને વ્રત'}</strong>
+            <p>{lang === 'hi' ? 'आज के दिन आने वाले उत्सव' : 'આજના દિવસે આવતા પર્વો'}</p>
+          </div>
+          <div class="path-arrow"><span class="material-symbols-outlined">arrow_forward</span></div>
+          <div class="path-step">
+            <span class="step-num">4</span>
+            <strong>{lang === 'hi' ? 'अर्थ व संदर्भ' : 'અર્થ અને મહત્વ'}</strong>
+            <p>{lang === 'hi' ? 'सांस्कृतिक एवं ऐतिहासिक पृष्ठभूमि' : 'સાંસ્કૃતિક અને ઐતિહાસિક પૃષ્ઠભૂમિ'}</p>
+          </div>
+        </div>
+
+        <p>
+          {lang === 'hi'
+            ? 'CheckYourCalendar आपको त्वरित तिथि रूपांतरण देखने की सुविधा देता है, साथ ही मानव इतिहास और परंपराओं में उस दिन के वास्तविक महत्व को समझने का अवसर प्रदान करता है।'
+            : 'CheckYourCalendar તમને ત્વરિત તારીખ રૂપાંતરણની સુવિધા આપવા ઉપરાંત માનવ ઇતિહાસ અને પરંપરાઓમાં આજના દિવસના સાચા મહત્વને સમજવાની તક આપે છે.'}
+        </p>
+
+        <h2 id="methodology">{lang === 'hi' ? 'काल-गणना पद्धति' : 'ગણતરી પદ્ધતિ'}</h2>
+        <p>
+          {lang === 'hi'
+            ? 'कैलेंडर गणनाएं अत्यंत संवेदनशील और खगोलीय नियमों पर आधारित होती हैं। हम प्रमाणित गणितीय और खगोलीय एल्गोरिदम का उपयोग करते हैं:'
+            : 'કેલેન્ડરની ગણતરીઓ અત્યંત સંવેદનશીલ અને ખગોળીય નિયમો પર આધારિત છે. અમે પ્રમાણિત ગાણિતિક અને ખગોળીય અલ્ગોરિધમનો ઉપયોગ કરીએ છીએ:'}
+        </p>
+        <ul>
+          <li>
+            <strong>{lang === 'hi' ? 'सौर कैलेंडर (Solar Calendars):' : 'સૌર કેલેન્ડરો (Solar Calendars):'}</strong> {lang === 'hi'
+              ? 'ग्रेगोरियन, सौर हिजरी (फ़ारसी), भारतीय शक संवत, कॉप्टिक और इथियोपियाई कैलेंडर पृथ्वी की सूर्य परिक्रमा और संक्रांति गणनाओं पर आधारित हैं।'
+              : 'ગ્રેગોરિયન, સૌર હિજરી (પર્શિયન), ભારતીય શક સંવત, કોપ્ટિક અને ઇથિયોપિયન કેલેન્ડરો પૃથ્વીની સૂર્ય પરિક્રમા અને સંક્રાંતિ ગણતરીઓ પર આધારિત છે.'}
+          </li>
+          <li>
+            <strong>{lang === 'hi' ? 'चांद्र-सौर कैलेंडर (Lunisolar Calendars):' : 'ચંદ્ર-સૌર કેલેન્ડરો (Lunisolar Calendars):'}</strong> {lang === 'hi'
+              ? 'विक्रम संवत (गुजराती/हिंदू), हिब्रू और चीनी पारंपरिक कैलेंडर चंद्र कलाओं (तिथियों) को सौर वर्ष के साथ सामंजस्य में रखने के लिए अधिक मास (Adhik Maas / Leap Month) का उपयोग करते हैं।'
+              : 'વિક્રમ સંવત (ગુજરાતી/હિન્દુ), હિબ્રૂ અને ચાઇનીઝ કેલેન્ડરો ચંદ્ર કળા (તિથિ) અને ઋતુચક્રના તાલમેલ માટે અધિક માસ (Adhik Maas) પદ્ધતિ વાપરે છે.'}
+          </li>
+          <li>
+            <strong>{lang === 'hi' ? 'विशुद्ध चांद्र कैलेंडर (Pure Lunar Calendars):' : 'શુદ્ધ ચાંદ્ર કેલેન્ડરો (Pure Lunar Calendars):'}</strong> {lang === 'hi'
+              ? 'हिजरी (इस्लामी नागरिक) कैलेंडर में १२ चंद्र मास होते हैं (~३५४ दिन)। हमने मानक उम्म अल-कुरा नागरिक गणनाओं को आधार बनाया है।'
+              : 'હિજરી (ઇસ્લામિક) કેલેન્ડરમાં ૧૨ ચંદ્ર માસ હોય છે (~૩૫૪ દિવસ). અમે પ્રમાણિત ઉમ્મ અલ-કુરા ગણતરીઓને આધાર બનાવી છે.'}
+          </li>
+        </ul>
+
+        <h2>{lang === 'hi' ? 'शोध और प्रमाणिकता के मानक' : 'સંશોધન અને પ્રામાણિકતાના ધોરણો'}</h2>
+        <p>
+          {lang === 'hi'
+            ? 'हम सांस्कृतिक और धार्मिक जानकारियों की सटीकता को सर्वोच्च प्राथमिकता देते हैं:'
+            : 'અમે સાંસ્કૃતિક અને ધાર્મિક માહિતીની ચોકસાઈને સર્વોચ્ચ પ્રાથમિકતા આપીએ છીએ:'}
+        </p>
+        <ul>
+          <li>
+            <strong>{lang === 'hi' ? 'तथ्य-आधारित सामग्री:' : 'તથ્ય આધારિત માહિતી:'}</strong> {lang === 'hi'
+              ? 'सभी विवरण और ऐतिहासिक संदर्भ शोधकर्ताओं द्वारा सत्यापित हैं।'
+              : 'તમામ વિગતો અને ઐતિહાસિક સંદર્ભો ચકાસાયેલા છે.'}
+          </li>
+          <li>
+            <strong>{lang === 'hi' ? 'विश्वसनीय स्रोत:' : 'વિશ્વસનીય સ્ત્રોતો:'}</strong> {lang === 'hi'
+              ? 'हम अकादमिक प्रकाशनों, सरकारी गजटों और खगोलीय पंचांगों का संदर्भ लेते हैं।'
+              : 'અમે શૈક્ષણિક સાહિત્ય, સરકારી ગેઝેટ અને ખગોળીય પંચાંગોનો આધાર લઈએ છીએ.'}
+          </li>
+          <li>
+            <strong>{lang === 'hi' ? 'समान आदर:' : 'સમાન આદર:'}</strong> {lang === 'hi'
+              ? 'सभी परंपराओं को सम्मानपूर्वक और निष्पक्ष दृष्टिकोण के साथ प्रस्तुत किया गया है।'
+              : 'તમામ પરંપરાઓને સન્માનપૂર્વક અને તટસ્થ દ્રષ્ટિકોણ સાથે રજૂ કરવામાં આવી છે.'}
+          </li>
+        </ul>
+
+        <h2 id="faq">{lang === 'hi' ? 'अक्सर पूछे जाने वाले प्रश्न (FAQ)' : 'વારંવાર પૂછાતા પ્રશ્નો (FAQ)'}</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3>{lang === 'hi' ? 'विभिन्न कैलेंडरों में आज की तारीख कैसे देखें?' : 'વિવિધ કેલેન્ડરોમાં આજની તારીખ કેવી રીતે જોવી?'}</h3>
+            <p>
+              {lang === 'hi'
+                ? `हमारे होमपेज पर, CheckYourCalendar आपकी स्थानीय तिथि के आधार पर सभी ८ समर्थित कैलेंडर प्रणालियों में आज की तारीख और पर्व प्रदर्शित करता है।`
+                : `અમારા હોમપેજ પર, CheckYourCalendar તમારી સ્થાનિક તારીખના આધારે તમામ ૮ સમર્થિત કેલેન્ડરોમાં આજની તારીખ અને તહેવારો દર્શાવે છે.`}
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>{lang === 'hi' ? 'CheckYourCalendar किन कैलेंडरों का समर्थन करता है?' : 'CheckYourCalendar કયા કેલેન્ડરોને સમર્થન આપે છે?'}</h3>
+            <p>
+              {lang === 'hi'
+                ? 'विक्रम संवत (गुजराती/हिंदू), हिजरी (इस्लामी नागरिक), हिब्रू (यहूदी), सौर हिजरी (फ़ारसी), भारतीय राष्ट्रीय पंचांग (शक संवत), चीनी पारंपरिक (चांद्र-सौर), कॉप्टिक और इथियोपियाई कैलेंडर।'
+                : 'વિક્રમ સંવત (ગુજરાતી/હિન્દુ), હિજરી (ઇસ્લામિક), હિબ્રૂ (યહૂદી), સૌર હિજરી (પર્શિયન), ભારતીય રાષ્ટ્રીય પંચાંગ (શક સંવત), ચાઇનીઝ પારંપરિક, કોપ્ટિક અને ઇથિયોપિયન કેલેન્ડર.'}
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>{lang === 'hi' ? 'कैलेंडर रूपांतरण की गणना कैसे की जाती है?' : 'કેલેન્ડર રૂપાંતરણની ગણતરી કેવી રીતે થાય છે?'}</h3>
+            <p>
+              {lang === 'hi'
+                ? 'प्रत्येक कैलेंडर के लिए समर्पित गणना इंजन हैं जो UTC ग्रेगोरियन तिथि को पारंपरिक खगोलीय नियमों और युग-प्रणालियों में रूपांतरित करते हैं।'
+                : 'દરેક કેલેન્ડર માટે સમર્પિત ગણતરી એન્જિન છે જે UTC ગ્રેગોરિયન તારીખને પારંપરિક ખગોળીય નિયમોમાં રૂપાંતરિત કરે છે.'}
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>{lang === 'hi' ? 'ग्रेगोरियन कैलेंडर पर त्योहारों की तारीखें हर साल क्यों बदलती हैं?' : 'ગ્રેગોરિયન કેલેન્ડર પર તહેવારોની તારીખ દર વર્ષે કેમ બદલાય છે?'}</h3>
+            <p>
+              {lang === 'hi'
+                ? 'सौर वर्ष लगभग ३६५.२४ दिनों का होता है, जबकि १२ चंद्र मास लगभग ३५४ दिन के होते हैं। इसलिए चंद्र और चांद्र-सौर त्योहार सौर कैलेंडर पर हर साल अलग-अलग तिथियों पर आते हैं।'
+                : 'સૌર વર્ષ લગભગ ૩૬૫.૨૪ દિવસનું હોય છે, જ્યારે ૧૨ ચંદ્ર માસ આશરે ૩૫૪ દિવસના હોય છે. આથી ચંદ્ર આધારિત તહેવારો દર વર્ષે અલગ ગ્રેગોરિયન તારીખે આવે છે.'}
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3>{lang === 'hi' ? 'सुझाव या सुधार कैसे भेजें?' : 'સૂચન કે સુધારો કેવી રીતે મોકલવો?'}</h3>
+            <p>
+              {lang === 'hi'
+                ? `यदि आप कोई विसंगति देखते हैं या कोई नया पर्व सुझाना चाहते हैं, तो कृपया हमारे संपर्क पृष्ठ के माध्यम से संदेश भेजें।`
+                : `જો આપ કોઈ વિસંગતતા જુઓ અથવા નવો તહેવાર સૂચવવા માંગતા હો, તો કૃપા કરીને અમારા સંપર્ક પેજ દ્વારા સંદેશ મોકલો.`}
+            </p>
+          </div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .editorial-article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    line-height: 1.15;
+  }
+
+  .article-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-xs);
+  }
+
+  .article-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .article-body h2 {
+    font-family: var(--font-serif);
+    font-size: 1.625rem;
+    color: var(--color-primary);
+    margin-top: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .article-body p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+  }
+
+  .article-body ul {
+    list-style-type: square;
+    padding-left: var(--spacing-lg);
+    font-size: 0.9375rem;
+    color: var(--color-on-background);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  /* FAQ Section Styling */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+  }
+
+  .faq-item {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .faq-item h3 {
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    color: var(--color-primary);
+  }
+
+  .faq-item p {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+    line-height: 1.5;
+  }
+
+  .faq-item a {
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: underline;
+  }
+
+  /* Mission Path Bento style timeline */
+  .mission-path {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    background-color: var(--color-surface-dim);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-sm) 0;
+  }
+
+  .path-step {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    position: relative;
+  }
+
+  .step-num {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-sm);
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-container);
+    opacity: 0.5;
+  }
+
+  .path-step strong {
+    font-family: var(--font-serif);
+    color: var(--color-primary);
+    font-size: 1.125rem;
+  }
+
+  .path-step p {
+    font-size: 0.8125rem;
+    color: var(--color-on-surface-variant);
+    margin-top: 4px;
+  }
+
+  .path-arrow {
+    display: none;
+    justify-content: center;
+    color: var(--color-outline-variant);
+  }
+
+  @media (min-width: 768px) {
+    .mission-path {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .path-step {
+      width: 22%;
+      min-height: 120px;
+    }
+
+    .path-arrow {
+      display: flex;
+    }
+  }
+</style>

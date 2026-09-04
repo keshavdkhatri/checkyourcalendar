@@ -1,0 +1,135 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { useTranslations } from '../../i18n/utils';
+import type { Locale } from '../../i18n/types';
+
+export async function getStaticPaths() {
+  return [
+    { params: { lang: 'hi' } },
+    { params: { lang: 'gu' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = useTranslations(lang);
+
+const content = {
+  hi: {
+    title: 'सेवा की शर्तें (Terms of Service)',
+    subtitle: 'साइट उपयोग और जानकारी संबंधी नियम व अस्वीकरण',
+    lead: 'CheckYourCalendar में आपका स्वागत है। हमारे प्लेटफ़ॉर्म का उपयोग करके, आप नीचे उल्लिखित शर्तों और अस्वीकरणों का पालन करने के लिए सहमत होते हैं।',
+    h2Accuracy: 'सटीकता अस्वीकरण',
+    pAccuracy: 'यद्यपि हम कैलेंडर गणनाओं, रूपांतरण तर्क और सांस्कृतिक पर्वों में पूर्ण सटीकता के लिए प्रयासरत रहते हैं, CheckYourCalendar केवल सूचनात्मक और शैक्षणिक उद्देश्यों के लिए प्रदान किया जाता है।',
+    h2Ownership: 'सामग्री का स्वामित्व',
+    pOwnership: 'सभी संपादकीय सामग्री, कैलेंडर जानकारी, डिज़ाइन टेम्पलेट और लेआउट CheckYourCalendar की बौद्धिक संपदा हैं। उचित श्रेय के साथ संदर्भ साझा किए जा सकते हैं, परंतु सामग्री की सामूहिक कॉपी/स्क्रैपिंग निषिद्ध है।',
+    h2Contact: 'संपर्क',
+    pContact: 'यदि आपके कोई प्रश्न हैं या आप किसी गणना विसंगति की रिपोर्ट करना चाहते हैं, तो कृपया हमारे संपर्क पृष्ठ के माध्यम से या inquiries@checkyourcalendar.com पर संपर्क करें।'
+  },
+  gu: {
+    title: 'સેવાની શરતો (Terms of Service)',
+    subtitle: 'સાઇટ વપરાશ અને માહિતી સંબંધી નિયમો અને ડિસ્ક્લેમર',
+    lead: 'CheckYourCalendar માં આપનું સ્વાગત છે. અમારા પ્લેટફોર્મનો ઉપયોગ કરીને, આપ નીચે દર્શાવેલ શરતો અને નિયમોનું પાલન કરવા સંમત થાઓ છો.',
+    h2Accuracy: 'ચોકસાઈ અંગે ડિસ્ક્લેમર',
+    pAccuracy: 'જોકે અમે કેલેન્ડર ગણતરીઓ, રૂપાંતરણ તર્ક અને સાંસ્કૃતિક પર્વોમાં સંપૂર્ણ ચોકસાઈ રાખવાનો પ્રયત્ન કરીએ છીએ, CheckYourCalendar માત્ર માહિતી અને શૈક્ષણિક હેતુઓ માટે પૂરું પાડવામાં આવે છે.',
+    h2Ownership: 'સામગ્રીની માલિકી',
+    pOwnership: 'તમામ સંપાદકીય સામગ્રી, કેલેન્ડર માહિતી, ડિઝાઇન ટેમ્પ્લેટ્સ અને લેઆઉટ CheckYourCalendar ની બૌદ્ધિક સંપદા છે. યોગ્ય સંદર્ભ સાથે માહિતી શેર કરી શકાય છે, પરંતુ સામૂહિક સ્ક્રેપિંગ પ્રતિબંધિત છે.',
+    h2Contact: 'સંપર્ક',
+    pContact: 'જો આપને કોઈ પ્રશ્ન હોય અથવા કેલેન્ડર ક્ષતિની જાણ કરવા માંગતા હો, તો કૃપા કરીને અમારા સંપર્ક પેજ દ્વારા અથવા inquiries@checkyourcalendar.com પર અમારો સંપર્ક કરો.'
+  }
+}[lang];
+---
+
+<Layout 
+  title={t.terms.title} 
+  description={t.terms.metaDesc}
+  lang={lang}
+>
+  <Header lang={lang} />
+
+  <main class="container main-content">
+    <article class="editorial-article">
+      <header class="article-header">
+        <h1 class="article-title">{content.title}</h1>
+        <p class="article-subtitle">{content.subtitle}</p>
+      </header>
+
+      <section class="article-body">
+        <p class="lead">{content.lead}</p>
+
+        <h2>{content.h2Accuracy}</h2>
+        <p>{content.pAccuracy}</p>
+
+        <h2>{content.h2Ownership}</h2>
+        <p>{content.pOwnership}</p>
+
+        <h2>{content.h2Contact}</h2>
+        <p>{content.pContact}</p>
+      </section>
+    </article>
+  </main>
+
+  <Footer lang={lang} />
+</Layout>
+
+<style>
+  .main-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .editorial-article {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    border-bottom: 2px solid var(--color-primary);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    line-height: 1.15;
+  }
+
+  .article-subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-xs);
+  }
+
+  .article-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+    font-weight: 500;
+  }
+
+  .article-body h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-top: var(--spacing-md);
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding-bottom: var(--spacing-xs);
+  }
+
+  .article-body p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-on-background);
+  }
+</style>
