@@ -48,13 +48,18 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     <meta property="og:url" content={Astro.url.href} />
     <meta property="og:title" content={`${title} | CheckYourCalendar`} />
     <meta property="og:description" content={description} />
-    <!-- OG Image placeholder will be configured later -->
+    <meta property="og:image" content="https://checkyourcalendar.com/og-card.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CheckYourCalendar — Today's Date Across Calendars" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url.href} />
     <meta property="twitter:title" content={`${title} | CheckYourCalendar`} />
     <meta property="twitter:description" content={description} />
+    <meta name="twitter:image" content="https://checkyourcalendar.com/og-card.png" />
+    <meta name="twitter:image:alt" content="CheckYourCalendar — Today's Date Across Calendars" />
 
     <!-- Google Fonts: Playfair Display & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
