@@ -45,6 +45,7 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="CheckYourCalendar" />
     <meta property="og:url" content={Astro.url.href} />
     <meta property="og:title" content={`${title} | CheckYourCalendar`} />
     <meta property="og:description" content={description} />
@@ -54,10 +55,10 @@ const resolvedCanonical = canonicalUrl || Astro.url.href;
     <meta property="og:image:alt" content="CheckYourCalendar — Today's Date Across Calendars" />
     
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={Astro.url.href} />
-    <meta property="twitter:title" content={`${title} | CheckYourCalendar`} />
-    <meta property="twitter:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url.href} />
+    <meta name="twitter:title" content={`${title} | CheckYourCalendar`} />
+    <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content="https://checkyourcalendar.com/og-card.png" />
     <meta name="twitter:image:alt" content="CheckYourCalendar — Today's Date Across Calendars" />
 
