@@ -11,27 +11,52 @@ import Footer from '../components/Footer.astro';
     <article class="editorial-article">
       <header class="article-header">
         <h1 class="article-title">Privacy Policy</h1>
-        <p class="article-subtitle">Data collection, tracking, and cookie usage disclosures</p>
+        <p class="article-subtitle">Information practices, analytics, and cookie usage disclosures</p>
       </header>
 
       <section class="article-body">
         <p class="lead">
-          Your privacy is important to us. CheckYourCalendar does not collect personal information, track users, or store cookies for core functionality.
+          CheckYourCalendar provides multi-calendar conversions, cultural observances, and date exploration. This policy explains what information is collected when you visit our website, how analytics work, and how we handle direct communications.
         </p>
 
-        <h2>Cookie-Free Analytics</h2>
+        <h2>Website Architecture & Data Storage</h2>
         <p>
-          We use <strong>Cloudflare Web Analytics</strong> to measure site performance, page popularity, and traffic volumes. This analytics solution is privacy-respecting and completely cookie-free. It does not track individual users or compile cross-site profiles.
+          CheckYourCalendar operates as a static website. We do not offer user accounts, user logins, or profiles, and we do not maintain a database for website visitors. The site does not contain a web-based contact form that stores submissions in a database.
+        </p>
+
+        <h2>Website Analytics</h2>
+        <p>
+          We use two analytics systems to measure traffic, monitor site performance, and understand how visitors interact with our content:
+        </p>
+        <ul>
+          <li>
+            <strong>Cloudflare Web Analytics:</strong> We use Cloudflare Web Analytics to measure overall traffic volume and site performance. According to Cloudflare's documentation, Cloudflare Web Analytics is privacy-focused, does not use cookies or client-side storage for measurement, and does not collect visitors' personal data.
+          </li>
+          <li>
+            <strong>Google Analytics 4:</strong> We use Google Analytics 4 (GA4) to understand site usage patterns, such as page visits, sessions, approximate geographic region (country or city level), and browser or device characteristics. The standard GA4 web implementation uses first-party analytics cookies and client identifiers (such as <code>_ga</code> and <code>_ga_&lt;container-id&gt;</code>) to measure interactions across browsing sessions.
+          </li>
+        </ul>
+
+        <h2>Cookies & Identifiers</h2>
+        <p>
+          Our core calendar calculations and date conversions run directly in your browser without requiring cookies. Cloudflare Web Analytics measurement also does not use cookies or client-side state. However, Google Analytics sets first-party analytics cookies on your device to collect aggregate usage statistics. You can manage or disable cookies through your browser settings, or use browser add-ons designed to opt out of Google Analytics tracking.
+        </p>
+
+        <h2>Email Correspondence</h2>
+        <p>
+          The website does not operate an account system or database for contact submissions. Messages sent by email are handled through our email service. If you contact us by email, we may use the information you provide to respond to your message, investigate reported calendar issues, or consider suggestions.
         </p>
 
         <h2>Data Security</h2>
         <p>
-          Since CheckYourCalendar operates statically without user accounts, databases, or user-submitted content, there is no storage of personal credentials or profiles that could be subject to unauthorized access.
+          Because CheckYourCalendar operates statically on Cloudflare's global content delivery network without user accounts or web databases, there is no storage of user credentials or personal profile data on our servers.
         </p>
 
-        <h2>Future Changes</h2>
+        <h2>Privacy Inquiries</h2>
         <p>
-          If we introduce optional features in the future that require cookies or user consent (such as search personalization, subscription newsletters, or ads), we will update this policy and provide a clear consent mechanism before launch.
+          If you have any questions or feedback regarding this Privacy Policy or our information practices, please contact us at:
+          <br />
+          <a href="mailto:inquiries@checkyourcalendar.com"><strong>inquiries@checkyourcalendar.com</strong></a>
         </p>
       </section>
     </article>
@@ -98,5 +123,36 @@ import Footer from '../components/Footer.astro';
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--color-on-background);
+  }
+
+  .article-body ul {
+    list-style-type: square;
+    padding-left: var(--spacing-lg);
+    font-size: 0.9375rem;
+    color: var(--color-on-background);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .article-body li {
+    line-height: 1.6;
+  }
+
+  .article-body a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-body a:hover {
+    color: var(--color-primary-container);
+  }
+
+  .article-body code {
+    background-color: var(--color-surface-dim);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
   }
 </style>
