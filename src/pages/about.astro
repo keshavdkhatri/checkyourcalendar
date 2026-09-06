@@ -301,7 +301,6 @@ import Footer from '../components/Footer.astro';
     list-style: none;
     user-select: none;
     gap: var(--spacing-sm);
-    transition: color var(--transition-fast);
   }
 
   .faq-question::-webkit-details-marker {
@@ -317,10 +316,6 @@ import Footer from '../components/Footer.astro';
 
   .faq-item[open] .faq-icon {
     transform: rotate(180deg);
-  }
-
-  .faq-question:hover {
-    color: var(--color-primary-container);
   }
 
   .faq-question:focus-visible {

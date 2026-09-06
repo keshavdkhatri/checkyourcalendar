@@ -374,7 +374,6 @@ const faqList = {
     list-style: none;
     user-select: none;
     gap: var(--spacing-sm);
-    transition: color var(--transition-fast);
   }
 
   .faq-question::-webkit-details-marker {
@@ -390,10 +389,6 @@ const faqList = {
 
   .faq-item[open] .faq-icon {
     transform: rotate(180deg);
-  }
-
-  .faq-question:hover {
-    color: var(--color-primary-container);
   }
 
   .faq-question:focus-visible {
