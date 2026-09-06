@@ -75,69 +75,120 @@ import Footer from '../components/Footer.astro';
 
         <h2 id="faq">Frequently Asked Questions</h2>
         <div class="faq-list">
-          <div class="faq-item">
-            <h3>How do I see today's date in different calendar systems?</h3>
-            <p>
-              On our <a href="/">Homepage</a>, CheckYourCalendar automatically detects your local date and displays its exact real-time conversion across all 8 supported calendar systems simultaneously, alongside any major cultural observances occurring today.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How do I check and compare today's date across multiple calendar systems?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                When you open CheckYourCalendar, the homepage automatically detects your local date and displays its conversion across all supported calendar systems simultaneously. Alongside today’s date in solar, lunar, and lunisolar traditions, the page shows any major cultural or religious observances occurring today. You can also select any date using the calendar picker to explore its coordinates across world traditions.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>Which calendar systems does CheckYourCalendar support?</h3>
-            <p>
-              We provide full mathematical and astronomical conversions for 8 major historical and civil systems:
-              <strong>Vikram Samvat (Gujarati/Hindu)</strong>,
-              <strong>Hijri (Islamic Civil / Umm al-Qura)</strong>,
-              <strong>Hebrew (Jewish)</strong>,
-              <strong>Persian (Solar Hijri)</strong>,
-              <strong>Indian National (Saka)</strong>,
-              <strong>Chinese Traditional (Lunisolar)</strong>,
-              <strong>Coptic (Alexandrian)</strong>, and
-              <strong>Ethiopian (Ge'ez)</strong>.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Which calendar systems are supported on CheckYourCalendar?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                CheckYourCalendar currently supports date conversions and cultural contexts for 8 major historical, religious, and civil calendar systems alongside the standard Gregorian calendar: Vikram Samvat (Gujarati/Hindu), Islamic Hijri, Hebrew, Persian (Solar Hijri), Indian National (Saka), Chinese Traditional (Lunisolar), Coptic, and Ethiopian. Additional calendar systems may be added over time.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>How are the calendar conversions calculated?</h3>
-            <p>
-              Each calendar uses dedicated calculation engines that map UTC Gregorian coordinates to traditional astronomical rules, lunisolar intercalations, and epoch standards (such as Anno Martyrum for Coptic, Vikram Samvat eras for Hindu Panchang, and the 60-year sexagenary cycle for Chinese).
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How does calendar conversion work between different timekeeping systems?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Every calendar system measures time from a specific historical starting point (its epoch) and follows distinct astronomical or civil rules. Calendar conversion works by translating a date into a standardized universal time coordinate and then calculating the corresponding year, month, day, and cycle in the target calendar using verified astronomical formulas and calendar algorithms.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>Why do lunar and lunisolar festival dates change every year on the Gregorian calendar?</h3>
-            <p>
-              A solar year is approximately 365.24 days, whereas 12 lunar cycles equal roughly 354 days. Because pure lunar calendars (like the Hijri calendar) and lunisolar calendars (like Hindu Vikram Samvat, Hebrew, and Chinese) track moon phases, their months shift relative to the fixed solar Gregorian calendar, causing festivals like Diwali, Ramadan, Pesach, and Chinese New Year to fall on different Gregorian dates each year.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>What is the difference between solar, lunar, and lunisolar calendar systems?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>Calendar systems are categorized by the celestial cycles they track:</p>
+              <p>
+                Solar calendars, such as Gregorian, Persian, and Indian Saka, track the Earth's orbit around the Sun (about 365.24 days) to keep dates aligned with the solar seasons.
+              </p>
+              <p>
+                Pure lunar calendars, such as the Islamic Hijri calendar, follow the 12 lunar phase cycles (about 354 days), causing dates to move through all four seasons over a roughly 33-year cycle.
+              </p>
+              <p>
+                Lunisolar calendars, such as Hindu Vikram Samvat, Hebrew, and Chinese calendars, track lunar months while periodically adding a leap month to stay synchronized with the solar year.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>Why might a traditional observance differ by one day depending on location?</h3>
-            <p>
-              Certain traditions rely on local astronomical phenomena—such as the physical sighting of the lunar crescent or sunrise-based tithi boundaries in a specific timezone. We use standardized civil and astronomical algorithms as an authoritative baseline, while noting regional sighting variations where applicable.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Why do different calendars have different years and dates for the same day?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Different cultures anchored their calendars to different historical, astronomical, or spiritual milestones as their starting year (epoch). For example, the Gregorian calendar uses the Common Era (CE), while Vikram Samvat, the Islamic Hijri calendar, and the Hebrew calendar use different historical eras and starting points. Because systems also use different month lengths and leap-year rules, the numerical date for the same physical day naturally differs across calendars.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>What is the difference between a calendar system and an observance?</h3>
-            <p>
-              A <strong>calendar system</strong> is a framework for measuring time and organizing years and months. An <strong>observance</strong> is a specific cultural festival, religious holy day, fast, or public holiday that occurs on a designated coordinate within that calendar system.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Why do traditional festival and holiday dates change every year on the Gregorian calendar?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                Many traditional cultural and religious holidays—such as Diwali, Eid, Passover, and Lunar New Year—are scheduled according to lunar or lunisolar calendars rather than the solar Gregorian calendar. Because a lunar year of 12 moon cycles is about 10 to 11 days shorter than a 365-day solar year, these festivals can move relative to the Gregorian calendar from year to year, while lunisolar calendars use leap months to maintain longer-term alignment with the solar year.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>How does the Chinese lunisolar calendar work?</h3>
-            <p>
-              The traditional Chinese calendar (农历 / Nónglì) aligns lunar months with solar terms (Jiéqì) to keep festivals aligned with astronomical seasons. It identifies each year by combining the Ten Heavenly Stems and Twelve Earthly Branches with corresponding zodiac animals (such as 丙午 Bing-Wu, the Year of the Horse).
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Why might a calendar date or traditional observance differ by one day depending on location?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                In many traditional timekeeping systems, dates and festival timings depend on local astronomical events—such as when the sun rises in a specific city or when the new crescent moon is physically sighted in a given region. Timezone differences can also place the same astronomical event on different local civil dates. To provide consistent conversions, CheckYourCalendar uses standardized astronomical baselines and documented reference standards.
+              </p>
+            </div>
+          </details>
 
-          <div class="faq-item">
-            <h3>How can I report a calculation discrepancy or suggest an observance?</h3>
-            <p>
-              If you notice a calendar variance or would like to suggest an observance, please submit your feedback through our <a href="/contact">Contact Page</a>. We review all suggestions against primary astronomical, academic, and cultural records.
-            </p>
-          </div>
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How does CheckYourCalendar ensure accuracy in its calendar calculations?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                CheckYourCalendar uses established astronomical algorithms, open-source calculation libraries, and recognized civil standards, such as the Umm al-Qura standard for Islamic dates and standard solar-lunar calculation models for Indian Panchang. These methods are designed to provide consistent calendar calculations, but some religious or regional observances may follow local authorities, moon sightings, or regional customs.
+              </p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>What is the difference between a calendar date and an observance?</span>
+              <span class="material-symbols-outlined faq-icon" aria-hidden="true">expand_more</span>
+            </summary>
+            <div class="faq-answer">
+              <p>
+                A calendar date is a mathematical coordinate in time within a specific system, such as a given day, month, and year. An observance is a cultural festival, religious holy day, fasting period, national holiday, or international commemoration that takes place on or spans across designated calendar coordinates. A single calendar date can host multiple observances across different global traditions.
+              </p>
+            </div>
+          </details>
         </div>
       </section>
     </article>
@@ -216,11 +267,11 @@ import Footer from '../components/Footer.astro';
     gap: var(--spacing-xs);
   }
 
-  /* FAQ Section Styling */
+  /* FAQ Accordion Section Styling */
   .faq-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     margin-top: var(--spacing-xs);
   }
 
@@ -228,27 +279,71 @@ import Footer from '../components/Footer.astro';
     background-color: var(--color-surface);
     border: 1px solid var(--color-outline);
     border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .faq-item[open] {
+    background-color: var(--color-surface-dim);
+    border-color: var(--color-outline-variant);
+  }
+
+  .faq-question {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-primary);
     padding: var(--spacing-md);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none;
+    user-select: none;
+    gap: var(--spacing-sm);
+    transition: color var(--transition-fast);
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-icon {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .faq-item[open] .faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .faq-question:hover {
+    color: var(--color-primary-container);
+  }
+
+  .faq-question:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  .faq-answer {
+    padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
   }
 
-  .faq-item h3 {
-    font-family: var(--font-serif);
-    font-size: 1.125rem;
-    color: var(--color-primary);
-  }
-
-  .faq-item p {
-    font-size: 0.875rem;
+  .faq-answer p {
+    font-size: 0.9375rem;
     color: var(--color-on-surface-variant);
-    line-height: 1.5;
+    line-height: 1.6;
+    margin: 0;
   }
 
-  .faq-item a {
+  .faq-answer a {
     color: var(--color-primary);
-    font-weight: 500;
     text-decoration: underline;
   }
 
